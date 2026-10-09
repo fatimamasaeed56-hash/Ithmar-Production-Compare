@@ -26,8 +26,8 @@ The user wants a separate welcome page combining company goals and real login on
 
 **How to apply:** Keep the green uploaded brand identity and integrated transparent logo. Do not invent certifications, statistics, or expand the ambiguous CNC wording into detailed service promises.
 
-The user chose separate demo access accepting any valid-format email while retaining real authentication, not replacing it.
+The user explicitly reversed the earlier choice of separate demo access: they now want real login only, no demo access.
 
-**Why:** They want to try the tool without verifying an email, but explicitly selected the option that preserves real login.
+**Why:** The user said “مابدي دخول تجريبي بدي دخول حقيقي”.
 
-**How to apply:** Label the demo as unverified DEMO access; never create a real authenticated session from the entered email or let demo state unlock the real protected routes. Keep demo and authenticated production records isolated.
+**How to apply:** Do not reintroduce any-email demo entry or authentication bypass. Keep the full-height login panel and language switch; the company-goals statement at the bottom must follow the selected language too.

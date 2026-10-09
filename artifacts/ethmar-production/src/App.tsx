@@ -1,4 +1,4 @@
-import { type ReactNode, lazy, Suspense, useState } from 'react';
+import { type ReactNode, lazy, Suspense } from 'react';
 import { useAuth } from '@workspace/replit-auth-web';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -18,8 +18,6 @@ const queryClient = new QueryClient();
 function Router() {
   const auth = useAuth();
   const [location, navigate] = useLocation();
-  const [demoEmail, setDemoEmail] = useState<string | null>(null);
-  const demoRoute = location === '/demo/compare' || location === '/demo/sources';
   const authError = new URLSearchParams(window.location.search).get('authError');
   const welcome = (
     <WelcomePage
@@ -29,27 +27,8 @@ function Router() {
       onLogin={auth.login}
       onEnter={() => navigate('/compare')}
       onRetry={() => { window.history.replaceState(null, '', window.location.pathname); auth.retry(); }}
-      onDemo={(email) => {
-        if (!/^[^\s@]+@[^\s@]+$/.test(email)) return;
-        setDemoEmail(email);
-        navigate('/demo/compare');
-      }}
     />
   );
-  if (demoRoute) {
-    if (!demoEmail) return <><Redirect to="/" />{welcome}</>;
-    return (
-      <StoreProvider key={`demo:${demoEmail}`}>
-        <Shell demo userName="DEMO" onLogout={() => { setDemoEmail(null); navigate('/'); }}>
-          <RoutedErrorBoundary>
-            <Suspense fallback={<div role="status">جارٍ تحميل التجربة…</div>}>
-              {location === '/demo/sources' ? <SourcesPage /> : <ComparePage />}
-            </Suspense>
-          </RoutedErrorBoundary>
-        </Shell>
-      </StoreProvider>
-    );
-  }
   const publicPage = location === '/' || location === '/welcome' || location === '/login';
   if (publicPage && !auth.isAuthenticated) return welcome;
   if (auth.isLoading) return <div dir="rtl" role="status" className="grid min-h-screen place-items-center text-primary">جارٍ التحقق من جلسة الدخول…</div>;

@@ -166,7 +166,7 @@ function buildCandidates(files: PFile[]): Candidate[] {
 
 export function ImportDialog() {
   const { importOpen, setImportOpen, addDataset } = useStore();
-  const [location, navigate] = useLocation();
+  const [, navigate] = useLocation();
   const mappingRef = useRef<HTMLElement>(null);
   const [files, setFiles] = useState<PFile[]>([]);
   const [notices, setNotices] = useState<string[]>([]);
@@ -208,7 +208,7 @@ export function ImportDialog() {
     });
     reset();
     setImportOpen(false);
-    navigate(location.startsWith('/demo/') ? '/demo/sources' : '/sources');
+    navigate('/sources');
   };
 
   const onFiles = async (list: FileList | null) => {

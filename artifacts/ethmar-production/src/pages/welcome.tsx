@@ -9,7 +9,6 @@ type Props = {
   onLogin: () => void;
   onEnter: () => void;
   onRetry: () => void;
-  onDemo: (email: string) => void;
 };
 
 const GOALS = [
@@ -26,9 +25,8 @@ const EN_GOALS = [
   { icon: GraduationCap, title: 'Comprehensive training', body: 'We aim to provide full training on advanced CNC equipment and products.' },
 ];
 
-export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin, onEnter, onRetry, onDemo }: Props) {
+export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin, onEnter, onRetry }: Props) {
   const [language, setLanguage] = useState<'ar' | 'en'>('ar');
-  const [email, setEmail] = useState('');
   const ar = language === 'ar';
   const t = (arabic: string, english: string) => ar ? arabic : english;
   return (
@@ -70,9 +68,12 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
           <p className="mt-3 text-[11px] text-muted-foreground">{t('تُعرض هذه البنود بوصفها أهدافاً وتطلعات للشركة، لا شهادات أو إحصاءات.', 'These are company goals and aspirations, not certifications or statistics.')}</p>
 
           <details className="group mt-4 rounded-md border bg-card/60 px-4 py-3 text-sm" data-testid="details-goals-original">
-            <summary className="cursor-pointer select-none font-medium text-primary">{t('النص الأصلي بالإنجليزية', 'Original company statement')}</summary>
-            <p dir="ltr" lang="en" className="mt-3 text-left leading-7 text-muted-foreground">
-              The company focuses on building a strong production base and an agency that works to provide the local market with local services in all types of plastic packaging with the highest quality standards and the best prices, in addition to any product selection before the customer and full training by advanced CNC devices on the products as well
+            <summary className="cursor-pointer select-none font-medium text-primary">{t('أهداف الشركة', 'Company goals')}</summary>
+            <p dir={ar ? 'rtl' : 'ltr'} lang={language} className="mt-3 text-start leading-7 text-muted-foreground">
+              {t(
+                'تركّز الشركة على بناء قاعدة إنتاجية قوية ووكالة تعمل على تزويد السوق المحلي بخدمات محلية في جميع أنواع العبوات البلاستيكية، بأعلى معايير الجودة وأفضل الأسعار، إضافةً إلى إتاحة اختيار المنتجات للعميل وتقديم تدريب متكامل باستخدام أجهزة CNC المتقدمة على المنتجات كذلك.',
+                'The company focuses on building a strong production base and an agency that works to provide the local market with local services in all types of plastic packaging with the highest quality standards and the best prices, in addition to any product selection before the customer and full training by advanced CNC devices on the products as well',
+              )}
             </p>
           </details>
         </section>
@@ -129,34 +130,6 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
                 </Button>
               </div>
             )}
-
-            <div className="mt-8 border-t pt-7">
-              <h3 className="text-lg font-semibold">{t('دخول تجريبي — DEMO', 'Demo access — DEMO')}</h3>
-              <p id="demo-description" className="mt-2 text-sm leading-7 text-muted-foreground">
-                {t('جرّب الأداة بأي إيميل بصيغة صحيحة. لا يتم التحقق من الإيميل أو إنشاء حساب، ولا يُرسل أو يُحفظ. تنتهي التجربة عند تحديث الصفحة أو الخروج.', 'Try the tool with any valid-format email. No email verification or account creation; the email is never sent or saved. Demo access ends on refresh or exit.')}
-              </p>
-              <form className="mt-5 space-y-3" onSubmit={(event) => { event.preventDefault(); onDemo(email.trim()); }}>
-                <label htmlFor="demo-email" className="block text-sm font-medium">{t('الإيميل التجريبي', 'Demo email')}</label>
-                <input
-                  id="demo-email"
-                  data-testid="input-demo-email"
-                  type="email"
-                  required
-                  maxLength={254}
-                  autoComplete="off"
-                  dir="ltr"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  aria-describedby="demo-description"
-                  placeholder="demo@example.com"
-                  className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-                <Button type="submit" variant="outline" size="lg" className="w-full" data-testid="button-demo-login">
-                  {t('ابدأ التجربة', 'Start demo')} <ArrowLeft className={`size-4 ${ar ? '' : 'rotate-180'}`} />
-                </Button>
-              </form>
-              <p className="mt-3 text-xs font-medium text-primary">{t('وضع تجريبي غير محمي — منفصل عن الدخول الحقيقي.', 'Unprotected demo mode — separate from real login.')}</p>
-            </div>
 
             <p className="mt-6 border-t pt-4 text-[11px] leading-6 text-muted-foreground">
               {t('للقراءة فقط · ملفات CSV تُقرأ داخل المتصفح ولا تُرسل أو تُحفظ. يُحفظ فقط ما يلزم للحساب وجلسة الدخول.', 'Read-only · CSV files are read in your browser, never uploaded or saved. Only account and login session information is stored.')}

@@ -22,26 +22,27 @@ function RecordCard({ rec, highlight }: { rec: SourceRecord; highlight?: FieldKe
         </div>
         <div>
           <dt className="text-muted-foreground">نوع السجل</dt>
-          <dd className="font-medium">{rec.kind === 'production' ? 'تشغيل إنتاج' : 'حدث توقف'}</dd>
+          <dd className="font-medium">{rec.kind === 'production' ? 'تشغيل إنتاج' : rec.kind === 'downtime' ? 'حدث توقف' : 'غير معروف'}</dd>
         </div>
         <div>
           <dt className="text-muted-foreground">اسم الملف</dt>
           <dd className="font-medium break-all">{rec.fileName ?? 'لا يوجد — نص رسالة'}</dd>
         </div>
         <div>
-          <dt className="text-muted-foreground">الصف الفعلي في CSV</dt>
-          <dd className="font-medium">
+          <dt className="text-muted-foreground">رقم الصف الأصلي في CSV</dt>
+          <dd className="font-medium" data-testid={`source-row-${rec.id}`}>
             {rec.physicalRow === null ? (
               'لا ينطبق'
             ) : (
               <span className="num">
                 {rec.physicalRow}
-                {rec.physicalRowEnd !== rec.physicalRow ? `–${rec.physicalRowEnd}` : ''}
+                {rec.physicalRowEnd != null && rec.physicalRowEnd !== rec.physicalRow ? `–${rec.physicalRowEnd}` : ''}
               </span>
             )}
           </dd>
         </div>
       </dl>
+      {rec.origin === 'csv' && <p className="px-3 pb-2 text-[11px] text-muted-foreground">رقم السطر الفعلي في الملف الأصلي، شاملًا رأس الأعمدة والأسطر الفارغة؛ قد يمتد السجل لعدة أسطر.</p>}
       <div className="px-3 pb-2">
         <div className="mb-1 flex items-center gap-1 text-[11px] text-muted-foreground">
           <FileText className="size-3" aria-hidden /> النص الخام للسجل

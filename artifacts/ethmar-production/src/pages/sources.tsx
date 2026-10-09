@@ -1,8 +1,8 @@
 import { Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { FIELD_META, FIELDS, fmtNum, LINES, type Dataset } from '@/lib/data';
+import { FIELD_META, FIELDS, LINES, type Dataset } from '@/lib/data';
 import { useStore } from '@/lib/store';
-import { OriginBadge, Unknown } from '@/components/bits';
+import { OriginBadge, MetricButton } from '@/components/bits';
 import { cn } from '@/lib/utils';
 
 function DatasetBlock({ ds }: { ds: Dataset }) {
@@ -68,11 +68,11 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
               <th className="px-3 py-2 text-start font-medium">الحالة</th>
               <th className="px-3 py-2 text-start font-medium">الخط</th>
               <th className="px-3 py-2 text-start font-medium">النوع</th>
-              <th className="px-3 py-2 text-start font-medium">الملف / الصف</th>
+              <th className="px-3 py-2 text-start font-medium">الملف / رقم الصف الأصلي</th>
               {FIELDS.map((f) => (
                 <th key={f} className="px-3 py-2 text-start font-medium">{FIELD_META[f].label}</th>
               ))}
-              <th className="px-3 py-2"><span className="sr-only">تفاصيل</span></th>
+              <th className="px-3 py-2 text-start font-medium">التتبّع</th>
             </tr>
           </thead>
           <tbody>
@@ -96,13 +96,25 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
                     const c = r.values[f];
                     return (
                       <td key={f} className="px-3 py-2">
-                        {c === undefined ? <span className="text-muted-foreground">—</span> : c.value === null ? <Unknown /> : <span className="num">{fmtNum(c.value)}</span>}
+                        {c === undefined ? <span className="text-muted-foreground">—</span> : (
+                          <MetricButton
+                            testId={`button-source-${r.id}-${f}`}
+                            m={{
+                              id: `${r.id}-${f}`,
+                              label: `${FIELD_META[f].label} — ${r.line}`,
+                              value: c.value,
+                              unit: FIELD_META[f].unit,
+                              kind: 'raw',
+                              deps: [{ recordId: r.id, field: f }],
+                            }}
+                          />
+                        )}
                       </td>
                     );
                   })}
                   <td className="px-3 py-2">
-                    <Button size="sm" variant="ghost" className="h-7" onClick={() => openTrace({ recordId: r.id })} data-testid={`button-record-detail-${r.id}`} aria-label={`تفاصيل ${r.label}`}>
-                      السجل الخام
+                    <Button size="sm" variant="ghost" className="h-7" onClick={() => openTrace({ recordId: r.id })} data-testid={`button-record-detail-${r.id}`} aria-label={`تتبّع القيم الخام — ${r.label}`}>
+                      التتبّع
                     </Button>
                   </td>
                 </tr>

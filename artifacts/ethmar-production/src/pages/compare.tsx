@@ -121,12 +121,18 @@ export default function ComparePage() {
           </span>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[560px] text-sm" data-testid="table-comparison">
+          <table className="w-full min-w-[680px] table-fixed text-sm" data-testid="table-comparison">
+            <colgroup>
+              <col className="w-[28%]" />
+              <col className="w-[24%]" />
+              <col className="w-[24%]" />
+              <col className="w-[24%]" />
+            </colgroup>
             <thead>
               <tr className="border-b bg-muted/50 text-xs text-muted-foreground">
                 <th scope="col" className="px-4 py-2 text-start font-medium">المقياس</th>
-                <th scope="col" className="num px-4 py-2 text-start font-semibold text-e1">E-01</th>
-                <th scope="col" className="num px-4 py-2 text-start font-semibold text-e2">E-02</th>
+                <th scope="col" className="num border-s px-6 py-4 text-center text-base font-semibold text-e1">E-01</th>
+                <th scope="col" className="num border-s px-6 py-4 text-center text-base font-semibold text-e2">E-02</th>
                 <th scope="col" className="px-4 py-2 text-start font-medium">الفرق (E-02 − E-01)</th>
               </tr>
             </thead>
@@ -142,8 +148,8 @@ export default function ComparePage() {
                       {r.label}
                       {r.key === 'downtime' && <span className="block text-[10px] text-muted-foreground">منفصل عن تغيير القالب</span>}
                     </th>
-                    <td className="px-4 py-2.5"><MetricButton m={a} testId={`button-table-E-01-${r.key}`} /></td>
-                    <td className="px-4 py-2.5"><MetricButton m={b} testId={`button-table-E-02-${r.key}`} /></td>
+                    <td className="border-s px-6 py-2.5 text-center"><MetricButton m={a} testId={`button-table-E-01-${r.key}`} /></td>
+                    <td className="border-s px-6 py-2.5 text-center"><MetricButton m={b} testId={`button-table-E-02-${r.key}`} /></td>
                     <td className="px-4 py-2.5"><MetricButton m={d} signed testId={`button-table-diff-${r.key}`} /></td>
                   </tr>
                 );

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "ETHMAR PLASTICS — مقارنة الإنتاج"
+description = "أداة عربية للقراءة فقط لمقارنة سجلات الإنتاج E-01 وE-02، باستيراد CSV وتتبع كل قيمة إلى صف المصدر، دون بيانات خارجية."
+version = "1.0.0"
+id = "artifacts/ethmar-production"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19912
+
+[services.development]
+run = "pnpm --filter @workspace/ethmar-production run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ethmar-production", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/ethmar-production/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19912"
+BASE_PATH = "/"

@@ -1,0 +1,1 @@
+- [Production evidence scope](production-scope.md) — Read-only ETHMAR comparison, user-supplied data only, source-row traceability and separate downtime.

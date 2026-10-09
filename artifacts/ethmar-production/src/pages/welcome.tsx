@@ -1,4 +1,4 @@
-import { ArrowLeft, Cpu, Factory, GraduationCap, LogIn, Package, RefreshCw, ShieldCheck, TriangleAlert } from 'lucide-react';
+import { ArrowLeft, Cpu, Factory, GraduationCap, LogIn, Package, RefreshCw, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 
@@ -28,6 +28,9 @@ const EN_GOALS = [
 export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin, onEnter, onRetry }: Props) {
   const [language, setLanguage] = useState<'ar' | 'en'>(() =>
     new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'ar',
+  );
+  const [mode, setMode] = useState<'login' | 'signup'>(() =>
+    window.location.pathname.endsWith('/signup') ? 'signup' : 'login',
   );
   const ar = language === 'ar';
   const t = (arabic: string, english: string) => ar ? arabic : english;
@@ -108,10 +111,25 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
             </Button>
           </div>
           <div className="my-auto py-10">
-            <div className="flex size-11 items-center justify-center rounded-md bg-secondary text-primary">
-              <ShieldCheck className="size-5" aria-hidden />
-            </div>
-            <h2 className="mt-5 text-xl font-bold">{t('تسجيل الدخول', 'Log in')}</h2>
+            <img
+              src={`${import.meta.env.BASE_URL}ithmar-logo.png`}
+              alt={t('إثمار للصناعات البلاستيكية', 'Ithmar Plastic Industries')}
+              width={819}
+              height={331}
+              className="mb-7 h-auto w-56 max-w-full"
+              data-testid="login-logo"
+            />
+            {!isAuthenticated && (
+              <div className="mb-6 grid grid-cols-2 gap-2" role="group" aria-label={t('خيارات الحساب', 'Account options')}>
+                <Button variant={mode === 'login' ? 'default' : 'outline'} aria-pressed={mode === 'login'} onClick={() => setMode('login')} data-testid="tab-login">
+                  {t('تسجيل الدخول', 'Log in')}
+                </Button>
+                <Button variant={mode === 'signup' ? 'default' : 'outline'} aria-pressed={mode === 'signup'} onClick={() => setMode('signup')} data-testid="tab-signup">
+                  {t('إنشاء حساب', 'Create account')}
+                </Button>
+              </div>
+            )}
+            <h2 className="mt-5 text-xl font-bold">{mode === 'signup' && !isAuthenticated ? t('إنشاء حساب جديد', 'Create your account') : t('تسجيل الدخول', 'Log in')}</h2>
 
             {isLoading ? (
               <div className="mt-4 space-y-3" data-testid="status-auth-loading" aria-busy="true">
@@ -140,16 +158,18 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
               <div className="mt-4" data-testid="status-auth-ok">
                 <p className="text-sm leading-7 text-muted-foreground">{t('تم تسجيل دخولك. يمكنك الآن متابعة مراجعة سجلات الإنتاج.', 'You are logged in. You can now review production records.')}</p>
                 <Button size="lg" className="mt-6 w-full" onClick={onEnter} data-testid="button-enter">
-                  {t('الدخول إلى الأداة', 'Open comparison')} <ArrowLeft className={`size-4 ${ar ? '' : 'rotate-180'}`} />
+                  {t('الانتقال إلى الرئيسية', 'Go to home')} <ArrowLeft className={`size-4 ${ar ? '' : 'rotate-180'}`} />
                 </Button>
               </div>
             ) : (
               <div className="mt-4">
                 <p className="text-sm leading-7 text-muted-foreground">
-                  {t('سجّل دخولك بأمان للوصول إلى المقارنة وسجلات المصدر. ستنتقل إلى صفحة التحقق من هويتك.', 'Log in securely to access comparisons and source records. You will be redirected to verify your identity.')}
+                  {mode === 'signup'
+                    ? t('أنشئ حسابك عبر خدمة المصادقة الآمنة. يُنشأ ملفك في الموقع تلقائيًا بعد التحقق من هويتك لأول مرة، ثم تنتقل إلى الصفحة الرئيسية.', 'Create your account through secure authentication. Your site profile is created automatically after your first identity verification, then you continue to home.')
+                    : t('سجّل دخولك بأمان للوصول إلى الرئيسية وسجلات المصدر. ستنتقل إلى صفحة التحقق من هويتك.', 'Log in securely to access home and source records. You will be redirected to verify your identity.')}
                 </p>
-                <Button size="lg" className="mt-6 w-full" onClick={onLogin} data-testid="button-login">
-                  <LogIn className="size-4" /> {t('تسجيل الدخول', 'Log in')}
+                <Button size="lg" className="mt-6 w-full" onClick={onLogin} data-testid={mode === 'signup' ? 'button-signup' : 'button-login'}>
+                  <LogIn className="size-4" /> {mode === 'signup' ? t('إنشاء حساب والمتابعة', 'Create account and continue') : t('تسجيل الدخول', 'Log in')}
                 </Button>
               </div>
             )}

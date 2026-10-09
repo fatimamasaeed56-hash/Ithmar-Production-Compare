@@ -59,7 +59,7 @@ export function useAuth(): AuthState {
 
   const login = useCallback(() => {
     const base = getBasePath();
-    window.location.href = `/api/login?returnTo=${encodeURIComponent(`${base === '/' ? '' : base}/compare`)}`;
+    window.location.href = `/api/login?returnTo=${encodeURIComponent(`${base === '/' ? '' : base}/home`)}`;
   }, []);
 
   const logout = useCallback(() => {

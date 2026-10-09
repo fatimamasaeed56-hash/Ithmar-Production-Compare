@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import { FileUp, Rows3, Scale, LogOut } from 'lucide-react';
+import { FileUp, Rows3, House, LogOut, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -9,7 +9,7 @@ import { SourceDetailDialog } from './source-detail-dialog';
 import { ImportDialog } from './import-dialog';
 
 const NAV = [
-  { href: '/compare', label: 'المقارنة', icon: Scale },
+  { href: '/home', label: 'الرئيسية', icon: House },
   { href: '/sources', label: 'سجلات المصدر', icon: Rows3 },
 ];
 
@@ -21,7 +21,7 @@ export function Shell({ children, onLogout, userName }: { children: ReactNode; o
       <header className="sticky top-0 z-30 border-b border-t-4 border-t-primary bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
           <div className="flex items-center gap-3 max-sm:w-full">
-            <Link href="/" aria-label="إثمار للصناعات البلاستيكية — الصفحة الرئيسية" className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Link href="/home" aria-label="إثمار للصناعات البلاستيكية — الصفحة الرئيسية" className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <img
                 src={`${import.meta.env.BASE_URL}ithmar-logo.png`}
                 alt="Ithmar Plastic Industries — إثمار للصناعات البلاستيكية"
@@ -37,7 +37,7 @@ export function Shell({ children, onLogout, userName }: { children: ReactNode; o
               <Link
                 key={n.href}
                 href={n.href}
-                data-testid={`link-${n.href === '/compare' ? 'compare' : 'sources'}`}
+                data-testid={`link-${n.href === '/home' ? 'compare' : 'sources'}`}
                 aria-current={loc === n.href ? 'page' : undefined}
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-sm transition-colors',
@@ -50,7 +50,10 @@ export function Shell({ children, onLogout, userName }: { children: ReactNode; o
             ))}
           </nav>
           <div className="ms-auto flex items-center gap-2">
-            <span className="max-w-28 truncate text-xs text-muted-foreground" data-testid="user-name-display">{userName}</span>
+            <Link href="/account" aria-current={loc === '/account' ? 'page' : undefined} data-testid="link-account" className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm text-primary hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <UserRound className="size-4" aria-hidden /><span>حسابي</span>
+            </Link>
+            <span className="hidden max-w-28 truncate text-xs text-muted-foreground lg:inline" data-testid="user-name-display">{userName}</span>
             <Button size="sm" variant="outline" onClick={() => setImportOpen(true)} data-testid="button-open-import">
               <FileUp className="size-4" /> استيراد CSV
             </Button>

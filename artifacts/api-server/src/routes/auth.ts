@@ -51,7 +51,7 @@ router.get('/login', async (req, res) => {
       prompt: 'login consent',
       state, nonce,
     });
-    const values = [verifier, nonce, state, safeReturn(req.query.returnTo, '/compare')];
+    const values = [verifier, nonce, state, safeReturn(req.query.returnTo, '/home')];
     flowCookies.forEach((name, i) => res.cookie(name, values[i], { ...cookieOptions, maxAge: 10 * 60 * 1000 }));
     res.redirect(url.href);
   } catch (error) {
@@ -64,7 +64,7 @@ router.get('/callback', async (req, res) => {
   const verifier = req.cookies?.code_verifier;
   const nonce = req.cookies?.nonce;
   const state = req.cookies?.state;
-  const returnTo = safeReturn(req.cookies?.return_to, '/compare');
+  const returnTo = safeReturn(req.cookies?.return_to, '/home');
   clearFlow(res);
   if (!verifier || !nonce || !state) {
     res.redirect('/?authError=expired');

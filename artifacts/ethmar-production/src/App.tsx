@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import WelcomePage from '@/pages/welcome';
+import AccountPage from '@/pages/account';
 import { Shell } from '@/components/shell';
 import { StoreProvider } from '@/lib/store';
 import { Route, Switch, Redirect, useLocation, Router as WouterRouter } from 'wouter';
@@ -25,11 +26,11 @@ function Router() {
       isLoading={auth.isLoading}
       error={auth.error || (authError ? 'لم يكتمل تسجيل الدخول. يمكنك المحاولة مرة أخرى.' : null)}
       onLogin={auth.login}
-      onEnter={() => navigate('/compare')}
+      onEnter={() => navigate('/home')}
       onRetry={() => { window.history.replaceState(null, '', window.location.pathname); auth.retry(); }}
     />
   );
-  const publicPage = location === '/' || location === '/welcome' || location === '/login';
+  const publicPage = location === '/' || location === '/welcome' || location === '/login' || location === '/signup';
   if (publicPage && !auth.isAuthenticated) return welcome;
   if (auth.isLoading) return <div dir="rtl" role="status" className="grid min-h-screen place-items-center text-primary">جارٍ التحقق من جلسة الدخول…</div>;
   if (!auth.isAuthenticated) return <><Redirect to="/" />{welcome}</>;
@@ -39,8 +40,10 @@ function Router() {
       <RoutedErrorBoundary>
         <Suspense fallback={<div role="status">جارٍ تحميل الصفحة…</div>}>
         <Switch>
+          <Route path="/home" component={ComparePage} />
           <Route path="/compare" component={ComparePage} />
           <Route path="/sources" component={SourcesPage} />
+          <Route path="/account">{auth.user && <AccountPage user={auth.user} onLogout={auth.logout} />}</Route>
           <Route component={NotFound} />
         </Switch>
         </Suspense>

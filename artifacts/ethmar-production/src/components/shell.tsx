@@ -23,11 +23,11 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-3 max-sm:w-full">
             <Link href="/" aria-label="إثمار للصناعات البلاستيكية — الصفحة الرئيسية" className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <img
-                src={`${import.meta.env.BASE_URL}ithmar-logo.jpeg`}
+                src={`${import.meta.env.BASE_URL}ithmar-logo.png`}
                 alt="Ithmar Plastic Industries — إثمار للصناعات البلاستيكية"
                 width={819}
                 height={331}
-                className="h-auto w-40 rounded-sm sm:w-48"
+                className="h-auto w-40 sm:w-48"
               />
             </Link>
             <span className="border-s border-border ps-3 text-xs font-medium text-primary">مقارنة سجلات الإنتاج</span>

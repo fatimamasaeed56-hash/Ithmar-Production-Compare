@@ -1,0 +1,5 @@
+run_id,event_id,record_type,input_kg,good_output_kg,scrap_kg,mold_change_hours,downtime_minutes,order_id,machine,mold,shift
+E-01,DEMO-E01-PRODUCTION,production,1000,950,50,4,,,,,
+E-01,DEMO-E01-PRODUCTION,production,1000,950,50,4,,,,,
+E-02,DEMO-E02-PRODUCTION,production,1000,,100,6,,,,,
+E-02,DEMO-E02-DOWNTIME,downtime,,,,,45,,,,

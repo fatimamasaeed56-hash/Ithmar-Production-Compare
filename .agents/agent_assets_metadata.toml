@@ -1,0 +1,30 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "-o6O70mlKDiBPBL3320qp"
+uri = "file://attached_assets/DEMO-production-valid.csv"
+type = "table"
+title = "ملف CSV صحيح للتجربة"
+description = "تشغيلان E-01 وE-02 وتوقف منفصل 45 دقيقة. معرّفات DEMO للتجربة فقط."
+logical_id = "c036c144-7b0c-462a-8ab3-9c11a761f145"
+content_hash = "sha256:f7ec62606988ab32d29e954ddbc896507dcf63ecdf4e360535ceb7986e07e6f5"
+size = 278
+mtime_ms = 1791579719022
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/c036c144-7b0c-462a-8ab3-9c11a761f145/f545a4fd-3692-4e6b-85af-d6b791e1bf7b"
+storage_version_token = "1791579733516742"
+content_type = "text/csv"
+
+[[outputs]]
+id = "94p7K0rw-s5FMKTr81qSg"
+uri = "file://attached_assets/DEMO-production-errors.csv"
+type = "table"
+title = "ملف CSV لاختبار مشكلات البيانات"
+description = "الصف 3 مكرر للصف 2، والصف 4 ينقصه الإنتاج السليم. يجب الاحتفاظ بكل الصفوف وإظهار رسالة خطأ."
+logical_id = "ff2e88cb-a2dc-4d69-bb94-e7679dfa6d55"
+content_hash = "sha256:d0ea8971b31e622245b8d02208a3549349a6f87cdc170b747649ef9ee68e8997"
+size = 330
+mtime_ms = 1791579720894
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/ff2e88cb-a2dc-4d69-bb94-e7679dfa6d55/70dd5c76-a883-468d-9c37-0fa159b0dce9"
+storage_version_token = "1791579734050363"
+content_type = "text/csv"

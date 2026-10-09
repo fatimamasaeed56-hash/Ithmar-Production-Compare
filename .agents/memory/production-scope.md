@@ -2,6 +2,12 @@
 name: ETHMAR production scope
 description: User-defined evidence and read-only constraints for production comparison
 ---
+
+ERP means the factory's existing business-management system. CSV is a spreadsheet-like export. This prototype is a read-only view of factory-approved exports and cannot change the original system.
+
+**Why:** The user explicitly defined the system terminology and wants missing or duplicate source data shown as “مشكلات في البيانات” with a visible error message.
+
+**How to apply:** Explain these terms in the internal tool, not the previously simplified welcome page. Retain problematic rows for tracing; never claim the app independently certifies an imported file. Only report an absent expected run where its expected identity is actually known.
 The user wants a read-only tool for the ETHMAR PLASTICS production manager to compare E-01 and E-02 using only user-supplied records, ultimately approved CSV exports. Every value must be traceable to its original source row. The additional E-02 unplanned stoppage is a separate record, not mold-change time.
 
 **Why:** The user explicitly limited the tool to their supplied data and required source-row traceability.

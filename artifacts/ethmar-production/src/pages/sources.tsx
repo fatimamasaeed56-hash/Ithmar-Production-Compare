@@ -4,6 +4,7 @@ import { FIELD_META, FIELDS, LINES, type Dataset } from '@/lib/data';
 import { useStore } from '@/lib/store';
 import { OriginBadge, MetricButton } from '@/components/bits';
 import { cn } from '@/lib/utils';
+import { DataIssues } from '@/components/data-issues';
 
 function DatasetBlock({ ds }: { ds: Dataset }) {
   const { active, setActiveId, openTrace, selectRecord, toggleDowntime } = useStore();
@@ -26,6 +27,7 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
           </Button>
         )}
       </div>
+      <DataIssues dataset={ds} />
       {ds.files.length > 0 && (
         <ul className="flex flex-wrap gap-x-4 gap-y-1 border-b bg-muted/30 px-4 py-2 text-[11px] text-muted-foreground">
           {ds.files.map((f) => (
@@ -81,7 +83,7 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
               return (
                 <tr key={r.id} className="border-b last:border-0 hover:bg-muted/30" data-testid={`row-record-${r.id}`}>
                   <td className="px-3 py-2"><span className={cn('rounded-sm px-1.5 py-0.5 text-[10px] whitespace-nowrap', s.c)}>{s.t}</span>
-                    {r.warnings.length > 0 && <details className="mt-1 min-w-36 text-e2"><summary className="cursor-pointer">تنبيه للمراجعة ({r.warnings.length})</summary><ul>{r.warnings.map((w, i) => <li key={i}>{w}</li>)}</ul></details>}
+                    {r.warnings.length > 0 && <details className="mt-1 min-w-36 text-destructive"><summary className="cursor-pointer">خطأ: مشكلات في البيانات ({r.warnings.length})</summary><ul>{r.warnings.map((w, i) => <li key={i}>{w}</li>)}</ul></details>}
                   </td>
                   <td className={cn('num px-3 py-2 text-start font-semibold', r.line === 'E-01' ? 'text-e1' : 'text-e2')}>{r.line}</td>
                   <td className="px-3 py-2 whitespace-nowrap">{r.kind === 'production' ? 'تشغيل' : r.kind === 'downtime' ? 'حدث توقف' : 'غير معروف'}</td>

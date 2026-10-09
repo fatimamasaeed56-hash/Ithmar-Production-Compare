@@ -14,9 +14,9 @@ export const UNIT_LABEL: Record<Unit, string> = {
 };
 
 export const FIELD_META: Record<FieldKey, { label: string; unit: Unit; csv: string }> = {
-  input: { label: 'المدخل (خامة)', unit: 'kg', csv: 'input_kg' },
-  good: { label: 'الإنتاج الجيد', unit: 'kg', csv: 'good_output_kg' },
-  scrap: { label: 'الهالك', unit: 'kg', csv: 'scrap_kg' },
+  input: { label: 'مدخلات المواد', unit: 'kg', csv: 'input_kg' },
+  good: { label: 'الإنتاج السليم', unit: 'kg', csv: 'good_output_kg' },
+  scrap: { label: 'الخردة', unit: 'kg', csv: 'scrap_kg' },
   mold: { label: 'زمن تغيير القالب', unit: 'h', csv: 'mold_change_hours' },
   downtime: { label: 'التوقف غير المخطط', unit: 'min', csv: 'unplanned_downtime_minutes' },
 };

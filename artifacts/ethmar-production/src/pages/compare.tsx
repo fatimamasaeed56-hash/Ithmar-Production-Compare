@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { computeLine, diffMetric, LINES, METRIC_ROWS, type LineId, type LineMetrics } from '@/lib/data';
 import { useStore } from '@/lib/store';
 import { MetricButton } from '@/components/bits';
+import { DataIssues } from '@/components/data-issues';
 import { cn } from '@/lib/utils';
 
 function LinePanel({ line, m, delay }: { line: LineId; m: LineMetrics; delay: number }) {
@@ -82,6 +83,7 @@ export default function ComparePage() {
 
   return (
     <div className="space-y-6">
+      <DataIssues dataset={active} />
       <div className="rise flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">مقارنة تشغيلين: E-01 مقابل E-02</h1>

@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { OriginBadge } from './bits';
 import { SourceDetailDialog } from './source-detail-dialog';
 import { ImportDialog } from './import-dialog';
+import { SystemTerms } from './system-terms';
 
 const NAV = [
   { href: '/home', label: 'الرئيسية', icon: House },
@@ -84,7 +85,10 @@ export function Shell({ children, onLogout, userName }: { children: ReactNode; o
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+      <main className="mx-auto max-w-6xl px-4 py-6">
+        {(loc === '/home' || loc === '/compare' || loc === '/sources') && <SystemTerms />}
+        {children}
+      </main>
       <footer className="mx-auto max-w-6xl px-4 pb-8 text-[11px] text-muted-foreground">
         للقراءة فقط · لا تعديل ولا حذف لبيانات المصدر · كل رقم قابل للنقر لعرض سجله الأصلي.
       </footer>

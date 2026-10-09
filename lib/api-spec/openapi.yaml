@@ -11,6 +11,38 @@ tags:
   - name: health
     description: Health operations
 paths:
+  /auth/user:
+    get:
+      operationId: getCurrentAuthUser
+      tags: [Auth]
+      responses:
+        "200":
+          description: Current authenticated user or null
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUserEnvelope"
+  /login:
+    get:
+      operationId: loginBrowserSession
+      tags: [Auth]
+      responses:
+        "302":
+          description: Redirect to OIDC provider
+  /callback:
+    get:
+      operationId: completeBrowserLogin
+      tags: [Auth]
+      responses:
+        "302":
+          description: Redirect after OIDC verification
+  /logout:
+    get:
+      operationId: logoutBrowserSession
+      tags: [Auth]
+      responses:
+        "302":
+          description: Clear session and redirect to welcome page
   /healthz:
     get:
       operationId: healthCheck
@@ -26,6 +58,28 @@ paths:
                 $ref: "#/components/schemas/HealthStatus"
 components:
   schemas:
+    AuthUser:
+      type: object
+      required: [id, email, firstName, lastName, profileImageUrl]
+      properties:
+        id:
+          type: string
+        email:
+          type: [string, "null"]
+        firstName:
+          type: [string, "null"]
+        lastName:
+          type: [string, "null"]
+        profileImageUrl:
+          type: [string, "null"]
+    AuthUserEnvelope:
+      type: object
+      required: [user]
+      properties:
+        user:
+          oneOf:
+            - $ref: "#/components/schemas/AuthUser"
+            - type: "null"
     HealthStatus:
       type: object
       properties:

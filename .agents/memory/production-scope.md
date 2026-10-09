@@ -8,7 +8,7 @@ The user wants a read-only tool for the ETHMAR PLASTICS production manager to co
 
 **How to apply:** Do not invent production data or certify imported exports as approved. Distinguish values supplied in chat from actual imported file evidence; absence of a stoppage record is unknown, not zero.
 
-CSV processing must stay in browser memory only: no upload or persistent saving, ERP connection or writes, login, database, or AI API. Use React, Vite, and TypeScript. Never silently remove incomplete or duplicate rows; warn and retain reviewability. Do not invent order, machine, mold, shift, or ERP identifiers; any demo identifiers must explicitly say DEMO.
+CSV processing must stay in browser memory only: no upload or persistent saving, ERP connection or writes, or AI API. The user later explicitly requested real login protecting comparison, superseding their earlier no-login requirement; account/session storage is separate from the prohibition on storing production CSV data. Use React, Vite, and TypeScript. Never silently remove incomplete or duplicate rows; warn and retain reviewability. Do not invent order, machine, mold, shift, or ERP identifiers; any demo identifiers must explicitly say DEMO.
 
 **Why:** The user explicitly requires this scope for this version.
 
@@ -19,3 +19,9 @@ The CSV intake must use PapaParse with header:true and skipEmptyLines:'greedy'. 
 **Why:** The user explicitly specified this import contract and distinguished blank lines from incomplete records.
 
 **How to apply:** Preserve original physical row positions and raw values; do not treat skipped blank lines as records or renumber source rows after skipping them.
+
+The user wants a separate welcome page combining company goals and real login on the same page. They supplied goals about a strong production base, local plastic-packaging services, quality and prices, customer product selection, and training with advanced CNC equipment.
+
+**Why:** These are company-provided aspirations, not independently verified certifications or performance figures.
+
+**How to apply:** Keep the green uploaded brand identity and integrated transparent logo. Do not invent certifications, statistics, or expand the ambiguous CNC wording into detailed service promises.

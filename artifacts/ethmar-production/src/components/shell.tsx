@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import { FileUp, Rows3, Scale } from 'lucide-react';
+import { FileUp, Rows3, Scale, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -9,11 +9,11 @@ import { SourceDetailDialog } from './source-detail-dialog';
 import { ImportDialog } from './import-dialog';
 
 const NAV = [
-  { href: '/', label: 'المقارنة', icon: Scale },
+  { href: '/compare', label: 'المقارنة', icon: Scale },
   { href: '/sources', label: 'سجلات المصدر', icon: Rows3 },
 ];
 
-export function Shell({ children }: { children: ReactNode }) {
+export function Shell({ children, onLogout, userName }: { children: ReactNode; onLogout: () => void; userName: string }) {
   const [loc] = useLocation();
   const { datasets, active, setActiveId, setImportOpen } = useStore();
   return (
@@ -37,7 +37,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <Link
                 key={n.href}
                 href={n.href}
-                data-testid={`link-${n.href === '/' ? 'compare' : 'sources'}`}
+                data-testid={`link-${n.href === '/compare' ? 'compare' : 'sources'}`}
                 aria-current={loc === n.href ? 'page' : undefined}
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-sm transition-colors',
@@ -50,8 +50,12 @@ export function Shell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="ms-auto flex items-center gap-2">
+            <span className="max-w-28 truncate text-xs text-muted-foreground" data-testid="user-name-display">{userName}</span>
             <Button size="sm" variant="outline" onClick={() => setImportOpen(true)} data-testid="button-open-import">
               <FileUp className="size-4" /> استيراد CSV
+            </Button>
+            <Button size="sm" variant="ghost" onClick={onLogout} data-testid="button-logout" aria-label="تسجيل الخروج">
+              <LogOut className="size-4" /><span className="hidden sm:inline">خروج</span>
             </Button>
           </div>
         </div>

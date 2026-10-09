@@ -117,7 +117,7 @@ export function SourceDetailDialog() {
   return (
     <Dialog open={!!trace} onOpenChange={(o) => !o && closeTrace()}>
       <DialogContent dir="rtl" className="max-h-[90dvh] max-w-2xl overflow-y-auto p-0 sm:rounded-md" data-testid="dialog-source-detail">
-        <DialogHeader className="sticky top-0 z-10 border-b bg-background/95 px-5 pt-5 pb-3 text-start backdrop-blur sm:text-start">
+        <DialogHeader className="sticky top-0 z-10 border-b bg-background/95 ps-5 pe-12 pt-5 pb-3 text-start backdrop-blur sm:text-start">
           <DialogTitle className="text-base">{metric ? metric.label : rec?.label ?? 'سجل'}</DialogTitle>
           <DialogDescription className="text-xs">
             {metric

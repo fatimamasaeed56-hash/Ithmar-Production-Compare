@@ -31,3 +31,9 @@ The user explicitly reversed the earlier choice of separate demo access: they no
 **Why:** The user said “مابدي دخول تجريبي بدي دخول حقيقي”.
 
 **How to apply:** Do not reintroduce any-email demo entry or authentication bypass. Keep the full-height login panel and language switch; the company-goals statement at the bottom must follow the selected language too.
+
+The user reiterated that the entire welcome page must switch between Arabic and English, not just the login section.
+
+**Why:** They explicitly requested “الصفحة كاملة” after prior language changes.
+
+**How to apply:** Apply the language to welcome content, all login states, goals, document direction and title. Keep the supplied bilingual logo unchanged.

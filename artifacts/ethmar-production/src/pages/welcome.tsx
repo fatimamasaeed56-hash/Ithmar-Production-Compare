@@ -1,6 +1,6 @@
 import { ArrowLeft, Cpu, Factory, GraduationCap, LogIn, Package, RefreshCw, ShieldCheck, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type Props = {
   isAuthenticated: boolean;
@@ -26,9 +26,32 @@ const EN_GOALS = [
 ];
 
 export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin, onEnter, onRetry }: Props) {
-  const [language, setLanguage] = useState<'ar' | 'en'>('ar');
+  const [language, setLanguage] = useState<'ar' | 'en'>(() =>
+    new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'ar',
+  );
   const ar = language === 'ar';
   const t = (arabic: string, english: string) => ar ? arabic : english;
+  useEffect(() => {
+    const root = document.documentElement;
+    const previous = { lang: root.lang, dir: root.dir, title: document.title };
+    root.lang = language;
+    root.dir = language === 'ar' ? 'rtl' : 'ltr';
+    document.title = language === 'ar'
+      ? 'إثمار للصناعات البلاستيكية — أهلاً بكم'
+      : 'Ithmar Plastic Industries — Welcome';
+    return () => {
+      root.lang = previous.lang;
+      root.dir = previous.dir;
+      document.title = previous.title;
+    };
+  }, [language]);
+  const switchLanguage = () => {
+    const next = ar ? 'en' : 'ar';
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', next);
+    window.history.replaceState(window.history.state, '', url);
+    setLanguage(next);
+  };
   return (
     <div dir={ar ? 'rtl' : 'ltr'} lang={language} className="relative min-h-[100dvh] overflow-hidden bg-background">
       <div aria-hidden className="paper-grid pointer-events-none absolute inset-0 opacity-60 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
@@ -80,7 +103,7 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
 
         <aside className="order-first flex min-h-[100dvh] flex-col border-s bg-card px-6 py-6 md:order-none sm:px-8 lg:px-12" data-testid="login-panel">
           <div className="flex justify-end">
-            <Button variant="outline" onClick={() => setLanguage(ar ? 'en' : 'ar')} aria-label={ar ? 'Switch to English' : 'التبديل إلى العربية'} lang={ar ? 'en' : 'ar'} data-testid="button-language">
+            <Button variant="outline" onClick={switchLanguage} aria-label={ar ? 'Switch to English' : 'التبديل إلى العربية'} lang={ar ? 'en' : 'ar'} data-testid="button-language">
               {ar ? 'English' : 'العربية'}
             </Button>
           </div>
@@ -131,9 +154,6 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
               </div>
             )}
 
-            <p className="mt-6 border-t pt-4 text-[11px] leading-6 text-muted-foreground">
-              {t('للقراءة فقط · ملفات CSV تُقرأ داخل المتصفح ولا تُرسل أو تُحفظ. يُحفظ فقط ما يلزم للحساب وجلسة الدخول.', 'Read-only · CSV files are read in your browser, never uploaded or saved. Only account and login session information is stored.')}
-            </p>
           </div>
         </aside>
       </div>

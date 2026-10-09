@@ -9,6 +9,7 @@ type Props = {
   onLogin: () => void;
   onEnter: () => void;
   onRetry: () => void;
+  onDemo: (email: string) => void;
 };
 
 const GOALS = [
@@ -25,28 +26,18 @@ const EN_GOALS = [
   { icon: GraduationCap, title: 'Comprehensive training', body: 'We aim to provide full training on advanced CNC equipment and products.' },
 ];
 
-export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin, onEnter, onRetry }: Props) {
+export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin, onEnter, onRetry, onDemo }: Props) {
   const [language, setLanguage] = useState<'ar' | 'en'>('ar');
+  const [email, setEmail] = useState('');
   const ar = language === 'ar';
   const t = (arabic: string, english: string) => ar ? arabic : english;
   return (
     <div dir={ar ? 'rtl' : 'ltr'} lang={language} className="relative min-h-[100dvh] overflow-hidden bg-background">
       <div aria-hidden className="paper-grid pointer-events-none absolute inset-0 opacity-60 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
-      <div aria-hidden className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
+      <div aria-hidden className="absolute inset-x-0 top-0 z-10 h-1.5 bg-primary" />
 
-      <div className="relative mx-auto flex max-w-6xl justify-end px-4 pt-5">
-        <Button
-          variant="outline"
-          onClick={() => setLanguage(ar ? 'en' : 'ar')}
-          aria-label={ar ? 'Switch to English' : 'التبديل إلى العربية'}
-          lang={ar ? 'en' : 'ar'}
-          data-testid="button-language"
-        >
-          {ar ? 'English' : 'العربية'}
-        </Button>
-      </div>
-      <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-8 md:grid-cols-[1.25fr_1fr] md:items-start md:py-10 lg:gap-16">
-        <section className="rise">
+      <div className="relative mx-auto grid min-h-[100dvh] max-w-[1440px] md:grid-cols-[1.25fr_1fr] md:items-stretch">
+        <section className="rise px-5 py-12 sm:px-8 lg:px-14">
           <img
             src={`${import.meta.env.BASE_URL}ithmar-logo.png`}
             alt={t('إثمار للصناعات البلاستيكية', 'Ithmar Plastic Industries')}
@@ -86,8 +77,13 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
           </details>
         </section>
 
-        <aside className="rise md:sticky md:top-10" style={{ animationDelay: '200ms' }}>
-          <div className="rounded-lg border bg-card p-6 shadow-[0_24px_48px_-28px_hsl(var(--primary)/0.45)] sm:p-8">
+        <aside className="order-first flex min-h-[100dvh] flex-col border-s bg-card px-6 py-6 md:order-none sm:px-8 lg:px-12" data-testid="login-panel">
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={() => setLanguage(ar ? 'en' : 'ar')} aria-label={ar ? 'Switch to English' : 'التبديل إلى العربية'} lang={ar ? 'en' : 'ar'} data-testid="button-language">
+              {ar ? 'English' : 'العربية'}
+            </Button>
+          </div>
+          <div className="my-auto py-10">
             <div className="flex size-11 items-center justify-center rounded-md bg-secondary text-primary">
               <ShieldCheck className="size-5" aria-hidden />
             </div>
@@ -133,6 +129,34 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
                 </Button>
               </div>
             )}
+
+            <div className="mt-8 border-t pt-7">
+              <h3 className="text-lg font-semibold">{t('دخول تجريبي — DEMO', 'Demo access — DEMO')}</h3>
+              <p id="demo-description" className="mt-2 text-sm leading-7 text-muted-foreground">
+                {t('جرّب الأداة بأي إيميل بصيغة صحيحة. لا يتم التحقق من الإيميل أو إنشاء حساب، ولا يُرسل أو يُحفظ. تنتهي التجربة عند تحديث الصفحة أو الخروج.', 'Try the tool with any valid-format email. No email verification or account creation; the email is never sent or saved. Demo access ends on refresh or exit.')}
+              </p>
+              <form className="mt-5 space-y-3" onSubmit={(event) => { event.preventDefault(); onDemo(email.trim()); }}>
+                <label htmlFor="demo-email" className="block text-sm font-medium">{t('الإيميل التجريبي', 'Demo email')}</label>
+                <input
+                  id="demo-email"
+                  data-testid="input-demo-email"
+                  type="email"
+                  required
+                  maxLength={254}
+                  autoComplete="off"
+                  dir="ltr"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  aria-describedby="demo-description"
+                  placeholder="demo@example.com"
+                  className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+                <Button type="submit" variant="outline" size="lg" className="w-full" data-testid="button-demo-login">
+                  {t('ابدأ التجربة', 'Start demo')} <ArrowLeft className={`size-4 ${ar ? '' : 'rotate-180'}`} />
+                </Button>
+              </form>
+              <p className="mt-3 text-xs font-medium text-primary">{t('وضع تجريبي غير محمي — منفصل عن الدخول الحقيقي.', 'Unprotected demo mode — separate from real login.')}</p>
+            </div>
 
             <p className="mt-6 border-t pt-4 text-[11px] leading-6 text-muted-foreground">
               {t('للقراءة فقط · ملفات CSV تُقرأ داخل المتصفح ولا تُرسل أو تُحفظ. يُحفظ فقط ما يلزم للحساب وجلسة الدخول.', 'Read-only · CSV files are read in your browser, never uploaded or saved. Only account and login session information is stored.')}

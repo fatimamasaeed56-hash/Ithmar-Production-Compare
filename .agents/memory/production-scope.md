@@ -25,3 +25,9 @@ The user wants a separate welcome page combining company goals and real login on
 **Why:** These are company-provided aspirations, not independently verified certifications or performance figures.
 
 **How to apply:** Keep the green uploaded brand identity and integrated transparent logo. Do not invent certifications, statistics, or expand the ambiguous CNC wording into detailed service promises.
+
+The user chose separate demo access accepting any valid-format email while retaining real authentication, not replacing it.
+
+**Why:** They want to try the tool without verifying an email, but explicitly selected the option that preserves real login.
+
+**How to apply:** Label the demo as unverified DEMO access; never create a real authenticated session from the entered email or let demo state unlock the real protected routes. Keep demo and authenticated production records isolated.

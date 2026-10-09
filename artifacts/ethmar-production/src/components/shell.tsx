@@ -13,11 +13,14 @@ const NAV = [
   { href: '/sources', label: 'سجلات المصدر', icon: Rows3 },
 ];
 
-export function Shell({ children, onLogout, userName }: { children: ReactNode; onLogout: () => void; userName: string }) {
+export function Shell({ children, onLogout, userName, demo = false }: { children: ReactNode; onLogout: () => void; userName: string; demo?: boolean }) {
   const [loc] = useLocation();
   const { datasets, active, setActiveId, setImportOpen } = useStore();
   return (
     <div dir="rtl" className="min-h-[100dvh]">
+      {demo && <div role="status" className="border-b bg-secondary px-4 py-3 text-center text-sm text-primary" data-testid="demo-banner">
+        DEMO — تجربة غير محمية، وليست تسجيل دخول حقيقيًا. بيانات التجربة محلية ومنفصلة وتُمسح عند تحديث الصفحة أو الخروج.
+      </div>}
       <header className="sticky top-0 z-30 border-b border-t-4 border-t-primary bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
           <div className="flex items-center gap-3 max-sm:w-full">
@@ -36,12 +39,12 @@ export function Shell({ children, onLogout, userName }: { children: ReactNode; o
             {NAV.map((n) => (
               <Link
                 key={n.href}
-                href={n.href}
+                href={`${demo ? '/demo' : ''}${n.href}`}
                 data-testid={`link-${n.href === '/compare' ? 'compare' : 'sources'}`}
-                aria-current={loc === n.href ? 'page' : undefined}
+                aria-current={loc === `${demo ? '/demo' : ''}${n.href}` ? 'page' : undefined}
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-sm transition-colors',
-                  loc === n.href ? 'bg-primary text-primary-foreground' : 'hover:bg-muted',
+                  loc === `${demo ? '/demo' : ''}${n.href}` ? 'bg-primary text-primary-foreground' : 'hover:bg-muted',
                 )}
               >
                 <n.icon className="size-4" aria-hidden />
@@ -55,7 +58,7 @@ export function Shell({ children, onLogout, userName }: { children: ReactNode; o
               <FileUp className="size-4" /> استيراد CSV
             </Button>
             <Button size="sm" variant="ghost" onClick={onLogout} data-testid="button-logout" aria-label="تسجيل الخروج">
-              <LogOut className="size-4" /><span className="hidden sm:inline">خروج</span>
+              <LogOut className="size-4" /><span className="hidden sm:inline">{demo ? 'إنهاء التجربة' : 'خروج'}</span>
             </Button>
           </div>
         </div>

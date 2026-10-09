@@ -18,11 +18,19 @@ export function Shell({ children }: { children: ReactNode }) {
   const { datasets, active, setActiveId, setImportOpen } = useStore();
   return (
     <div dir="rtl" className="min-h-[100dvh]">
-      <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-t-4 border-t-primary bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
-          <div className="flex items-baseline gap-2">
-            <span dir="ltr" className="num text-sm font-semibold tracking-[0.18em]">ETHMAR&nbsp;PLASTICS</span>
-            <span className="text-xs text-muted-foreground">مقارنة سجلات الإنتاج</span>
+          <div className="flex items-center gap-3 max-sm:w-full">
+            <Link href="/" aria-label="إثمار للصناعات البلاستيكية — الصفحة الرئيسية" className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <img
+                src={`${import.meta.env.BASE_URL}ithmar-logo.jpeg`}
+                alt="Ithmar Plastic Industries — إثمار للصناعات البلاستيكية"
+                width={819}
+                height={331}
+                className="h-auto w-40 rounded-sm sm:w-48"
+              />
+            </Link>
+            <span className="border-s border-border ps-3 text-xs font-medium text-primary">مقارنة سجلات الإنتاج</span>
           </div>
           <nav className="flex gap-1" aria-label="التنقل الرئيسي">
             {NAV.map((n) => (

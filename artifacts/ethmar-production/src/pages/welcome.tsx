@@ -1,6 +1,6 @@
-import { ArrowLeft, Cpu, Factory, GraduationCap, LogIn, Package, RefreshCw, TriangleAlert } from 'lucide-react';
+import { ArrowDown, ArrowLeft, Cpu, Factory, GraduationCap, LogIn, Package, RefreshCw, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type Props = {
   isAuthenticated: boolean;
@@ -48,6 +48,13 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
       document.title = previous.title;
     };
   }, [language]);
+  const panelRef = useRef<HTMLElement>(null);
+  const focusPanel = () => {
+    const el = panelRef.current;
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.setTimeout(() => el.querySelector<HTMLButtonElement>('[data-panel-primary]')?.focus({ preventScroll: true }), 350);
+  };
   const switchLanguage = () => {
     const next = ar ? 'en' : 'ar';
     const url = new URL(window.location.href);
@@ -55,72 +62,73 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
     window.history.replaceState(window.history.state, '', url);
     setLanguage(next);
   };
+  const logoSrc = `${import.meta.env.BASE_URL}ithmar-logo.png`;
   return (
-    <div dir={ar ? 'rtl' : 'ltr'} lang={language} className="relative min-h-[100dvh] overflow-hidden bg-background">
-      <div aria-hidden className="paper-grid pointer-events-none absolute inset-0 opacity-60 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
+    <div dir={ar ? 'rtl' : 'ltr'} lang={language} className="relative min-h-[100dvh] overflow-x-hidden bg-background">
+      <div aria-hidden className="paper-grid pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
       <div aria-hidden className="absolute inset-x-0 top-0 z-10 h-1.5 bg-primary" />
 
-      <div className="relative mx-auto grid min-h-[100dvh] max-w-[1440px] md:grid-cols-[1.25fr_1fr] md:items-stretch">
-        <section className="rise px-5 py-12 sm:px-8 lg:px-14">
-          <img
-            src={`${import.meta.env.BASE_URL}ithmar-logo.png`}
-            alt={t('إثمار للصناعات البلاستيكية', 'Ithmar Plastic Industries')}
-            width={819}
-            height={331}
-            className="h-auto w-56 sm:w-72"
-            data-testid="img-logo"
-          />
-          <p className="mt-8 text-xs font-semibold tracking-wide text-primary">{t('إثمار للصناعات البلاستيكية', 'Ithmar Plastic Industries')}</p>
-          <h1 className="mt-2 text-3xl font-bold leading-tight text-foreground sm:text-4xl lg:text-5xl">
-            {t('أهلاً بكم في أداة', 'Welcome to')}
-            <span className="block text-primary">{t('مقارنة سجلات الإنتاج', 'Production Comparison')}</span>
-          </h1>
+      <div className="relative mx-auto max-w-[1440px] px-4 pb-10 pt-6 sm:px-6 lg:px-10">
+        <header className="rise flex items-center justify-between gap-4">
+          <img src={logoSrc} alt={t('إثمار للصناعات البلاستيكية', 'Ithmar Plastic Industries')} width={819} height={331} className="h-auto w-44 mix-blend-multiply sm:w-60" data-testid="img-logo" />
+          <Button variant="outline" onClick={switchLanguage} aria-label={ar ? 'Switch to English' : 'التبديل إلى العربية'} lang={ar ? 'en' : 'ar'} data-testid="button-language">
+            {ar ? 'English' : 'العربية'}
+          </Button>
+        </header>
 
-          <h2 className="mt-10 flex items-center gap-3 text-sm font-semibold text-foreground">
-            <span className="h-px w-8 bg-primary" /> {t('تطلعاتنا', 'Our goals')}
-          </h2>
-          <ol className="mt-4 grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2">
-            {(ar ? GOALS : EN_GOALS).map((g, i) => (
-              <li key={g.title} className="rise bg-card p-5" style={{ animationDelay: `${120 + i * 80}ms` }} data-testid={`card-goal-${i}`}>
-                <div className="flex items-center justify-between">
-                  <g.icon className="size-5 text-primary" aria-hidden />
-                  <span className="num text-xs text-muted-foreground">0{i + 1}</span>
-                </div>
-                <h3 className="mt-3 font-semibold">{g.title}</h3>
-                <p className="mt-1.5 text-sm leading-7 text-muted-foreground">{g.body}</p>
-              </li>
-            ))}
-          </ol>
-          <p className="mt-3 text-[11px] text-muted-foreground">{t('تُعرض هذه البنود بوصفها أهدافاً وتطلعات للشركة، لا شهادات أو إحصاءات.', 'These are company goals and aspirations, not certifications or statistics.')}</p>
+        <div className="mt-6 grid gap-5 lg:grid-cols-[1.35fr_1fr]">
+          <section className="rise relative isolate flex min-h-[560px] flex-col overflow-hidden rounded-xl border bg-[hsl(146_30%_18%)] text-white">
+            <img src={`${import.meta.env.BASE_URL}welcome-line.jpg`} alt="" aria-hidden className="absolute inset-0 -z-20 h-full w-full object-cover" />
+            <div aria-hidden className={`absolute inset-0 -z-10 ${ar ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-[hsl(146_35%_14%/.94)] via-[hsl(146_32%_18%/.78)] to-[hsl(146_30%_20%/.25)]`} />
+            <div className="flex flex-1 flex-col p-6 sm:p-10">
+              <p className="w-fit rounded-full bg-white/15 px-3 py-1 text-xs font-semibold tracking-wide text-[hsl(95_60%_85%)]">{t('إثمار للصناعات البلاستيكية', 'Ithmar Plastic Industries')}</p>
+              <h1 className="mt-5 max-w-xl text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+                {t('أهلاً بكم في أداة', 'Welcome to')}
+                <span className="block text-[hsl(95_55%_75%)]">{t('مقارنة سجلات الإنتاج', 'Production Comparison')}</span>
+              </h1>
+              <Button size="lg" onClick={focusPanel} className="mt-6 w-fit bg-white text-[hsl(146_31%_26%)] hover:bg-white/90" data-testid="button-get-started">
+                {t('ابدأ الآن', 'Get started')} <ArrowDown className="size-4 lg:hidden" /><ArrowLeft className={`hidden size-4 lg:block ${ar ? '' : 'rotate-180'}`} />
+              </Button>
 
-          <details className="group mt-4 rounded-md border bg-card/60 px-4 py-3 text-sm" data-testid="details-goals-original">
-            <summary className="cursor-pointer select-none font-medium text-primary">{t('أهداف الشركة', 'Company goals')}</summary>
-            <p dir={ar ? 'rtl' : 'ltr'} lang={language} className="mt-3 text-start leading-7 text-muted-foreground">
-              {t(
-                'تركّز الشركة على بناء قاعدة إنتاجية قوية ووكالة تعمل على تزويد السوق المحلي بخدمات محلية في جميع أنواع العبوات البلاستيكية، بأعلى معايير الجودة وأفضل الأسعار، إضافةً إلى إتاحة اختيار المنتجات للعميل وتقديم تدريب متكامل باستخدام أجهزة CNC المتقدمة على المنتجات كذلك.',
-                'The company focuses on building a strong production base and an agency that works to provide the local market with local services in all types of plastic packaging with the highest quality standards and the best prices, in addition to any product selection before the customer and full training by advanced CNC devices on the products as well',
-              )}
-            </p>
-          </details>
-        </section>
+              <div className="mt-auto pt-10">
+                <h2 className="flex items-center gap-3 text-sm font-semibold"><span className="h-px w-8 bg-white/60" /> {t('تطلعاتنا', 'Our goals')}</h2>
+                <ol className="mt-4 grid gap-px overflow-hidden rounded-lg border border-white/15 bg-white/15 sm:grid-cols-2">
+                  {(ar ? GOALS : EN_GOALS).map((g, i) => (
+                    <li key={g.title} className="rise bg-[hsl(146_32%_14%/.72)] p-4 backdrop-blur-sm" style={{ animationDelay: `${120 + i * 80}ms` }} data-testid={`card-goal-${i}`}>
+                      <div className="flex items-center justify-between">
+                        <g.icon className="size-5 text-[hsl(95_55%_75%)]" aria-hidden />
+                        <span className="num text-xs text-white/60">0{i + 1}</span>
+                      </div>
+                      <h3 className="mt-2 font-semibold">{g.title}</h3>
+                      <p className="mt-1 text-sm leading-6 text-white/75">{g.body}</p>
+                    </li>
+                  ))}
+                </ol>
+                <p className="mt-3 text-[11px] text-white/65">{t('تُعرض هذه البنود بوصفها أهدافاً وتطلعات للشركة، لا شهادات أو إحصاءات. الصورة توضيحية.', 'These are company goals and aspirations, not certifications or statistics. Image is illustrative.')}</p>
+                <details className="mt-3 rounded-md border border-white/15 bg-white/10 px-4 py-3 text-sm" data-testid="details-goals-original">
+                  <summary className="cursor-pointer select-none font-medium">{t('أهداف الشركة', 'Company goals')}</summary>
+                  <p dir={ar ? 'rtl' : 'ltr'} lang={language} className="mt-3 text-start leading-7 text-white/80">
+                    {t(
+                      'تركّز الشركة على بناء قاعدة إنتاجية قوية ووكالة تعمل على تزويد السوق المحلي بخدمات محلية في جميع أنواع العبوات البلاستيكية، بأعلى معايير الجودة وأفضل الأسعار، إضافةً إلى إتاحة اختيار المنتجات للعميل وتقديم تدريب متكامل باستخدام أجهزة CNC المتقدمة على المنتجات كذلك.',
+                      'The company focuses on building a strong production base and an agency that works to provide the local market with local services in all types of plastic packaging with the highest quality standards and the best prices, in addition to any product selection before the customer and full training by advanced CNC devices on the products as well',
+                    )}
+                  </p>
+                </details>
+              </div>
+            </div>
+          </section>
 
-        <aside className="order-first flex min-h-[100dvh] flex-col border-s bg-card px-6 py-6 md:order-none sm:px-8 lg:px-12" data-testid="login-panel">
-          <div className="flex items-center justify-between gap-4">
-            <img
-              src={`${import.meta.env.BASE_URL}ithmar-logo.png`}
-              alt={t('إثمار للصناعات البلاستيكية', 'Ithmar Plastic Industries')}
-              width={819}
-              height={331}
-              className="h-auto w-48 min-w-0 sm:w-56"
-              data-testid="login-logo"
-            />
-            <Button variant="outline" onClick={switchLanguage} aria-label={ar ? 'Switch to English' : 'التبديل إلى العربية'} lang={ar ? 'en' : 'ar'} data-testid="button-language">
-              {ar ? 'English' : 'العربية'}
-            </Button>
-          </div>
-          <div className="my-auto py-10">
+          <aside ref={panelRef} className="rise grid scroll-mt-4 overflow-hidden rounded-xl border bg-card sm:grid-cols-[0.8fr_1.2fr] lg:grid-cols-1 xl:grid-cols-[0.75fr_1.25fr]" style={{ animationDelay: '120ms' }} data-testid="login-panel">
+            <div className="flex flex-col justify-between gap-6 bg-secondary p-6">
+              <img src={logoSrc} alt={t('إثمار للصناعات البلاستيكية', 'Ithmar Plastic Industries')} width={819} height={331} className="h-auto w-48 max-w-full mix-blend-multiply" data-testid="login-logo" />
+              <div>
+                <p className="font-semibold text-secondary-foreground">{t('أهلاً بعودتك', 'Welcome back')}</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">{t('ادخل عبر خدمة المصادقة للوصول إلى مقارنة سجلات الإنتاج.', 'Sign in through authentication to reach production comparison.')}</p>
+              </div>
+            </div>
+            <div className="flex flex-col justify-center p-6 sm:p-8">
             {!isAuthenticated && (
-              <div className="mb-6 grid grid-cols-2 gap-2" role="group" aria-label={t('خيارات الحساب', 'Account options')}>
+              <div className="mb-2 grid grid-cols-2 gap-2" role="group" aria-label={t('خيارات الحساب', 'Account options')}>
                 <Button variant={mode === 'login' ? 'default' : 'outline'} aria-pressed={mode === 'login'} onClick={() => setMode('login')} data-testid="tab-login">
                   {t('تسجيل الدخول', 'Log in')}
                 </Button>
@@ -146,7 +154,7 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
                   <span>{ar ? error : 'We could not verify your login. Please try again.'}</span>
                 </div>
                 <div className="mt-5 grid gap-2">
-                  <Button size="lg" onClick={onRetry} data-testid="button-retry">
+                  <Button size="lg" data-panel-primary onClick={onRetry} data-testid="button-retry">
                     <RefreshCw className="size-4" /> {t('إعادة المحاولة', 'Try again')}
                   </Button>
                   <Button size="lg" variant="outline" onClick={onLogin} data-testid="button-login">
@@ -157,7 +165,7 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
             ) : isAuthenticated ? (
               <div className="mt-4" data-testid="status-auth-ok">
                 <p className="text-sm leading-7 text-muted-foreground">{t('تم تسجيل دخولك. يمكنك الآن متابعة مراجعة سجلات الإنتاج.', 'You are logged in. You can now review production records.')}</p>
-                <Button size="lg" className="mt-6 w-full" onClick={onEnter} data-testid="button-enter">
+                <Button size="lg" className="mt-6 w-full" data-panel-primary onClick={onEnter} data-testid="button-enter">
                   {t('الانتقال إلى الرئيسية', 'Go to home')} <ArrowLeft className={`size-4 ${ar ? '' : 'rotate-180'}`} />
                 </Button>
               </div>
@@ -168,14 +176,15 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
                     ? t('أنشئ حسابك عبر خدمة المصادقة الآمنة. يُنشأ ملفك في الموقع تلقائيًا بعد التحقق من هويتك لأول مرة، ثم تنتقل إلى الصفحة الرئيسية.', 'Create your account through secure authentication. Your site profile is created automatically after your first identity verification, then you continue to home.')
                     : t('سجّل دخولك بأمان للوصول إلى الرئيسية وسجلات المصدر. ستنتقل إلى صفحة التحقق من هويتك.', 'Log in securely to access home and source records. You will be redirected to verify your identity.')}
                 </p>
-                <Button size="lg" className="mt-6 w-full" onClick={onLogin} data-testid={mode === 'signup' ? 'button-signup' : 'button-login'}>
+                <Button size="lg" className="mt-6 w-full" data-panel-primary onClick={onLogin} data-testid={mode === 'signup' ? 'button-signup' : 'button-login'}>
                   <LogIn className="size-4" /> {mode === 'signup' ? t('إنشاء حساب والمتابعة', 'Create account and continue') : t('تسجيل الدخول', 'Log in')}
                 </Button>
               </div>
             )}
 
-          </div>
-        </aside>
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
   );

@@ -36,7 +36,13 @@ The user explicitly reversed the earlier choice of separate demo access: they no
 
 **Why:** The user said “مابدي دخول تجريبي بدي دخول حقيقي”.
 
-**How to apply:** Do not reintroduce any-email demo entry or authentication bypass. Keep the full-height login panel and language switch; the company-goals statement at the bottom must follow the selected language too.
+**How to apply:** Do not reintroduce any-email demo entry or authentication bypass. Keep the language switch; the company-goals statement at the bottom must follow the selected language too.
+
+Use the user's supplied welcome/login reference for its division into a large welcome panel and an adjacent split login panel, not for its blue colors or alternate logo.
+
+**Why:** The user asked for “بس الفكرة والتقسيم” while keeping the established theme.
+
+**How to apply:** Preserve green Ithmar branding and real provider authentication; the reference's email/password fields do not authorize replacing authentication with a cosmetic form.
 
 The user reiterated that the entire welcome page must switch between Arabic and English, not just the login section.
 

@@ -22,7 +22,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
           <div className="flex items-baseline gap-2">
             <span dir="ltr" className="num text-sm font-semibold tracking-[0.18em]">ETHMAR&nbsp;PLASTICS</span>
-            <span className="text-xs text-muted-foreground">مقارنة تشغيل البثق</span>
+            <span className="text-xs text-muted-foreground">مقارنة سجلات الإنتاج</span>
           </div>
           <nav className="flex gap-1" aria-label="التنقل الرئيسي">
             {NAV.map((n) => (

@@ -225,7 +225,7 @@ export function computeLine(ds: Dataset, line: LineId, byId: Map<string, SourceR
   return { input, good, scrap, mold, downtime, yield: yieldM, scrapRate, balance };
 }
 
-export function diffMetric(a: Metric, b: Metric, key: string, label: string): Metric {
+export function diffMetric(a: Metric, b: Metric, key: string, label: string, order = 'E-01 − E-02'): Metric {
   const ok = a.value !== null && b.value !== null;
   const pct = a.unit === '%';
   const unit: Unit = pct ? 'pp' : a.unit;
@@ -233,12 +233,12 @@ export function diffMetric(a: Metric, b: Metric, key: string, label: string): Me
   const ua = pct ? '٪' : '';
   return {
     id: `diff-${key}`,
-    label: `فرق ${label} (E-01 − E-02)`,
+    label: `فرق ${label} (${order})`,
     value: val,
     unit,
     kind: 'derived',
     deps: [...a.deps, ...b.deps],
-    formula: pct ? `${label} E-01 − ${label} E-02 (بالنقاط المئوية)` : `${label} E-01 − ${label} E-02`,
+    formula: `${label}: ${order}${pct ? ' (بالنقاط المئوية)' : ''}`,
     substitution: ok ? `${fmtNum(a.value!)}${ua} − ${fmtNum(b.value!)}${ua} = ${fmtSigned(val!)} ${UNIT_LABEL[unit]}` : undefined,
     note: ok
       ? 'فرق حسابي بين سجلين فقط؛ لا يُستنتج منه سبب.'

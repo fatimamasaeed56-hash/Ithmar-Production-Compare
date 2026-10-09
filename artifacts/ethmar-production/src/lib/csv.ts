@@ -41,7 +41,7 @@ export function parseCsv(input: string): CsvParseResult {
     cells.push(cell);
     const raw = text.slice(startIdx, endIdx);
     if (cells.length === 1 && cells[0].trim() === '' && !cellQuoted) blankLines++;
-    else rows.push({ cells, startLine: start, endLine: line, raw });
+    rows.push({ cells, startLine: start, endLine: line, raw });
     cells = [];
     cell = '';
     cellQuoted = false;

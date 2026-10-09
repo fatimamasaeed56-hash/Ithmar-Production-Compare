@@ -17,7 +17,7 @@ function LinePanel({ line, m, delay }: { line: LineId; m: LineMetrics; delay: nu
       <div className={cn('absolute inset-y-0 start-0 w-1', e1 ? 'bg-e1' : 'bg-e2')} aria-hidden />
       <div className="flex items-center justify-between border-b px-5 py-3">
         <h2 className={cn('num text-lg font-semibold', e1 ? 'text-e1' : 'text-e2')}>{line}</h2>
-        <span className="text-xs text-muted-foreground">خط بثق</span>
+        <span className="text-xs text-muted-foreground">سجل تشغيل</span>
       </div>
       <div className="grid grid-cols-2 gap-px bg-border">
         <div className="bg-card px-5 py-4">
@@ -25,7 +25,7 @@ function LinePanel({ line, m, delay }: { line: LineId; m: LineMetrics; delay: nu
           <MetricButton m={m.yield} size="xl" />
         </div>
         <div className="bg-card px-5 py-4">
-          <div className="text-xs text-muted-foreground">نسبة الهالك</div>
+          <div className="text-xs text-muted-foreground">معدل الخردة</div>
           <MetricButton m={m.scrapRate} size="xl" />
         </div>
       </div>
@@ -61,6 +61,8 @@ export default function ComparePage() {
   }, [active, byId]);
 
   const yd = diffMetric(lm['E-01'].yield, lm['E-02'].yield, 'yield', 'نسبة المردود');
+  const sd = diffMetric(lm['E-02'].scrapRate, lm['E-01'].scrapRate, 'scrap-summary', 'معدل الخردة', 'E-02 − E-01');
+  const md = diffMetric(lm['E-02'].mold, lm['E-01'].mold, 'mold-summary', 'مدة تغيير القالب', 'E-02 − E-01');
 
   return (
     <div className="space-y-6">
@@ -74,6 +76,12 @@ export default function ComparePage() {
           <MetricButton m={yd} signed size="lg" testId="button-headline-yield-diff" />
         </div>
       </div>
+
+      <section className="rounded-md border bg-card p-4 text-sm space-y-2" aria-label="خلاصة الفروق">
+        <p>معدل خردة E-02 {sd.value === null ? 'غير قابل للمقارنة' : sd.value > 0 ? 'أعلى' : sd.value < 0 ? 'أقل' : 'مساوٍ'} مقارنةً بـ E-01. الفرق: <MetricButton m={sd} signed testId="scrap-summary" /></p>
+        <p>تغيير القالب في E-02 {md.value === null ? 'غير قابل للمقارنة' : md.value > 0 ? 'أطول' : md.value < 0 ? 'أقصر' : 'مساوٍ'} مقارنةً بـ E-01. الفرق: <MetricButton m={md} signed testId="mold-summary" /></p>
+        <p className="text-muted-foreground">توقف E-02 غير المخطط: <MetricButton m={lm['E-02'].downtime} /> — سجل منفصل؛ لا يُجمع مع تغيير القالب، ولا يدل على أنه سبّب طول التغيير.</p>
+      </section>
 
       <div className="grid gap-4 md:grid-cols-2">
         {LINES.map((l, i) => (
@@ -126,13 +134,13 @@ export default function ComparePage() {
         <div className="flex gap-2 rounded-md border border-dashed p-3">
           <Info className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
           <p>
-            المردود = الإنتاج الجيد ÷ المدخل × 100. الهالك ٪ = الهالك ÷ المدخل × 100. فرق المردود بالنقاط المئوية. لا تُحسب الفعالية الكلية للمعدات (OEE) لعدم توفر بيانات زمن التشغيل المخطط ومعدل الأداء.
+            معدل الخردة = كمية الخردة ÷ مدخلات المادة × 100. المردود = الإنتاج الجيد ÷ المدخل × 100. فروق المعدلات بالنقاط المئوية. لا تُحسب الفعالية الكلية للمعدات (OEE) لعدم توفر بياناتها.
           </p>
         </div>
         <div className="flex gap-2 rounded-md border border-dashed p-3">
           <Info className="mt-0.5 size-4 shrink-0 text-e2" aria-hidden />
           <p>
-            التوقف غير المخطط يُعرض منفصلاً عن تغيير القالب ولا يُجمع معه. القيمة المفقودة تظهر «غير معروف» ولا تُعامل كصفر. الفروق حسابية فقط ولا تحدد أسباباً.
+            أداة قراءة فقط: لا اتصال بنظام ERP ولا إرسال بيانات إليه. ملفات CSV تُعالج في ذاكرة المتصفح فقط دون رفع أو حفظ دائم، وتُفقد عند تحديث الصفحة. القيمة المفقودة تظهر «غير معروف» ولا تُعامل كصفر.
           </p>
         </div>
       </section>

@@ -106,7 +106,7 @@ function buildCandidates(files: PFile[]): Candidate[] {
       const where = `${f.name} · صف ${row.startLine}`;
       if (!prev && errors.length === 0) seen.set(sig, where);
       PROD_FIELDS.forEach((k) => {
-        if (hasProd && values[k] && values[k]!.value === null) warnings.push(`${FIELD_META[k].label}: خلية فارغة — غير معروف.`);
+        if (hasProd && values[k]?.value == null) warnings.push(`${FIELD_META[k].label}: حقل ناقص أو غير معيّن — غير معروف؛ الصف محفوظ للمراجعة.`);
       });
       out.push({
         fileId: f.id,
@@ -315,7 +315,7 @@ export function ImportDialog() {
                     <span className="num text-muted-foreground">{fmtNum(f.size)} B</span>
                     <span className="text-muted-foreground">
                       فاصل <span className="num">{f.delimiter}</span> · {f.hadBom ? 'BOM' : 'بدون BOM'} · <span className="num">{f.rows.length}</span> صف بيانات
-                      {f.blankLines ? ` · ${f.blankLines} سطر فارغ تماماً تم تخطيه` : ''}
+                      {f.blankLines ? ` · ${f.blankLines} سطر فارغ محفوظ للمراجعة ضمن الأخطاء` : ''}
                     </span>
                     {f.error && <span className="text-destructive">{f.error}</span>}
                     <button
@@ -471,6 +471,7 @@ export function ImportDialog() {
                                 <span>
                                   {c.rec.id === sel ? 'من صف التشغيل نفسه' : `${c.rec.fileName} صف ${c.rec.physicalRow}`} —{' '}
                                   <span className="num">{fmtNum(c.rec.values.downtime!.value!)}</span> دقيقة
+                                  {c.rec.warnings.map((w) => <span key={w} className="block text-e2">{w}</span>)}
                                 </span>
                               </label>
                             ))

@@ -26,6 +26,12 @@ The user wants a separate welcome page combining company goals and real login on
 
 **How to apply:** Keep the green uploaded brand identity and integrated transparent logo. Do not invent certifications, statistics, or expand the ambiguous CNC wording into detailed service promises.
 
+Place a clear company logo at the top of every page, not as a large background watermark.
+
+**Why:** The user explicitly chose “شعار واضح أعلى كل صفحة” over a full-interface background.
+
+**How to apply:** Preserve the transparent logo and its visible top placement in both public and signed-in interfaces, including mobile layouts.
+
 The user explicitly reversed the earlier choice of separate demo access: they now want real login only, no demo access.
 
 **Why:** The user said “مابدي دخول تجريبي بدي دخول حقيقي”.

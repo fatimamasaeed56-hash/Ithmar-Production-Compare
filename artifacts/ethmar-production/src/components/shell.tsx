@@ -27,7 +27,8 @@ export function Shell({ children, onLogout, userName }: { children: ReactNode; o
                 alt="Ithmar Plastic Industries — إثمار للصناعات البلاستيكية"
                 width={819}
                 height={331}
-                className="h-auto w-40 sm:w-48"
+                className="h-auto w-48 sm:w-56"
+                data-testid="header-logo"
               />
             </Link>
             <span className="border-s border-border ps-3 text-xs font-medium text-primary">مقارنة سجلات الإنتاج</span>

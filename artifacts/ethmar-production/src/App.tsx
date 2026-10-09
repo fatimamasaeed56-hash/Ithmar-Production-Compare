@@ -32,7 +32,16 @@ function Router() {
   );
   const publicPage = location === '/' || location === '/welcome' || location === '/login' || location === '/signup';
   if (publicPage && !auth.isAuthenticated) return welcome;
-  if (auth.isLoading) return <div dir="rtl" role="status" className="grid min-h-screen place-items-center text-primary">جارٍ التحقق من جلسة الدخول…</div>;
+  if (auth.isLoading) return (
+    <div dir="rtl" className="flex min-h-screen flex-col bg-background text-primary">
+      <header className="border-b border-t-4 border-t-primary px-4 py-3">
+        <div className="mx-auto max-w-6xl">
+          <img src={`${import.meta.env.BASE_URL}ithmar-logo.png`} alt="إثمار للصناعات البلاستيكية" width={819} height={331} className="h-auto w-48 sm:w-56" />
+        </div>
+      </header>
+      <div role="status" className="grid flex-1 place-items-center">جارٍ التحقق من جلسة الدخول…</div>
+    </div>
+  );
   if (!auth.isAuthenticated) return <><Redirect to="/" />{welcome}</>;
   return (
     <StoreProvider key={auth.user?.id}>

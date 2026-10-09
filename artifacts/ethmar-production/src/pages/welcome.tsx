@@ -105,20 +105,20 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
         </section>
 
         <aside className="order-first flex min-h-[100dvh] flex-col border-s bg-card px-6 py-6 md:order-none sm:px-8 lg:px-12" data-testid="login-panel">
-          <div className="flex justify-end">
-            <Button variant="outline" onClick={switchLanguage} aria-label={ar ? 'Switch to English' : 'التبديل إلى العربية'} lang={ar ? 'en' : 'ar'} data-testid="button-language">
-              {ar ? 'English' : 'العربية'}
-            </Button>
-          </div>
-          <div className="my-auto py-10">
+          <div className="flex items-center justify-between gap-4">
             <img
               src={`${import.meta.env.BASE_URL}ithmar-logo.png`}
               alt={t('إثمار للصناعات البلاستيكية', 'Ithmar Plastic Industries')}
               width={819}
               height={331}
-              className="mb-7 h-auto w-56 max-w-full"
+              className="h-auto w-48 min-w-0 sm:w-56"
               data-testid="login-logo"
             />
+            <Button variant="outline" onClick={switchLanguage} aria-label={ar ? 'Switch to English' : 'التبديل إلى العربية'} lang={ar ? 'en' : 'ar'} data-testid="button-language">
+              {ar ? 'English' : 'العربية'}
+            </Button>
+          </div>
+          <div className="my-auto py-10">
             {!isAuthenticated && (
               <div className="mb-6 grid grid-cols-2 gap-2" role="group" aria-label={t('خيارات الحساب', 'Account options')}>
                 <Button variant={mode === 'login' ? 'default' : 'outline'} aria-pressed={mode === 'login'} onClick={() => setMode('login')} data-testid="tab-login">

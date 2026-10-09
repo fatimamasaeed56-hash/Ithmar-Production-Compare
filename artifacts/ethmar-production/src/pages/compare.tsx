@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 
 function LinePanel({ line, m, delay }: { line: LineId; m: LineMetrics; delay: number }) {
   const e1 = line === 'E-01';
+  const { openTrace } = useStore();
   return (
     <section
       className="rise relative overflow-hidden rounded-md border bg-card"
@@ -27,6 +28,20 @@ function LinePanel({ line, m, delay }: { line: LineId; m: LineMetrics; delay: nu
         <div className="bg-card px-5 py-4">
           <div className="text-xs text-muted-foreground">معدل الخردة</div>
           <MetricButton m={m.scrapRate} size="xl" />
+          {m.scrapRate.substitution ? (
+            <button
+              type="button"
+              dir="ltr"
+              data-testid={`scrap-equation-${line}`}
+              aria-label={`معادلة معدل الخردة ومصادرها — ${line}`}
+              onClick={() => openTrace({ metric: m.scrapRate })}
+              className="num mt-2 block w-full rounded-sm text-start text-xs leading-relaxed text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {m.scrapRate.substitution}
+            </button>
+          ) : (
+            <p className="mt-2 text-xs text-muted-foreground">{m.scrapRate.note}</p>
+          )}
         </div>
       </div>
       {/* material bar */}
@@ -60,7 +75,7 @@ export default function ComparePage() {
     return r;
   }, [active, byId]);
 
-  const yd = diffMetric(lm['E-01'].yield, lm['E-02'].yield, 'yield', 'نسبة المردود');
+  const yd = diffMetric(lm['E-02'].yield, lm['E-01'].yield, 'yield', 'نسبة المردود');
   const sd = diffMetric(lm['E-02'].scrapRate, lm['E-01'].scrapRate, 'scrap-summary', 'معدل الخردة', 'E-02 − E-01');
   const md = diffMetric(lm['E-02'].mold, lm['E-01'].mold, 'mold-summary', 'مدة تغيير القالب', 'E-02 − E-01');
 
@@ -72,7 +87,7 @@ export default function ComparePage() {
           <p className="mt-1 text-sm text-muted-foreground">انقر أي رقم لعرض السجل والحقل والوحدة التي جاء منها، أو الصيغة التي اشتُق بها.</p>
         </div>
         <div className="rounded-md border bg-card px-4 py-2 text-sm">
-          <div className="text-[11px] text-muted-foreground">فرق المردود (E-01 − E-02)</div>
+          <div className="text-[11px] text-muted-foreground">فرق المردود (E-02 − E-01)</div>
           <MetricButton m={yd} signed size="lg" testId="button-headline-yield-diff" />
         </div>
       </div>
@@ -104,14 +119,14 @@ export default function ComparePage() {
                 <th scope="col" className="px-4 py-2 text-start font-medium">المقياس</th>
                 <th scope="col" className="num px-4 py-2 text-start font-semibold text-e1">E-01</th>
                 <th scope="col" className="num px-4 py-2 text-start font-semibold text-e2">E-02</th>
-                <th scope="col" className="px-4 py-2 text-start font-medium">الفرق (E-01 − E-02)</th>
+                <th scope="col" className="px-4 py-2 text-start font-medium">الفرق (E-02 − E-01)</th>
               </tr>
             </thead>
             <tbody>
               {METRIC_ROWS.map((r) => {
                 const a = lm['E-01'][r.key];
                 const b = lm['E-02'][r.key];
-                const d = diffMetric(a, b, r.key, r.label);
+                const d = diffMetric(b, a, r.key, r.label);
                 const sepBefore = r.key === 'mold';
                 return (
                   <tr key={r.key} className={cn('border-b last:border-0 hover:bg-muted/30', sepBefore && 'border-t-2 border-t-border')}>

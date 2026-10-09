@@ -10,7 +10,7 @@ export const UNIT_LABEL: Record<Unit, string> = {
   h: 'ساعة',
   min: 'دقيقة',
   '%': '٪',
-  pp: 'نقطة مئوية',
+  pp: 'نقاط مئوية',
 };
 
 export const FIELD_META: Record<FieldKey, { label: string; unit: Unit; csv: string }> = {
@@ -199,12 +199,12 @@ export function computeLine(ds: Dataset, line: LineId, byId: Map<string, SourceR
       kind: 'derived',
       deps: [...num.deps, ...input.deps],
       formula: `${fname} ÷ المدخل × 100`,
-      substitution: ok ? `${fmtNum(num.value!)} ÷ ${fmtNum(iv!)} × 100 = ${fmtNum(val!)}٪` : undefined,
+      substitution: ok ? `${fmtNum(num.value!)} ÷ ${fmtNum(iv!)} × 100 = ${fmtNum(val!)}%` : undefined,
       note: ok ? undefined : iv === 0 ? 'المدخل صفر — النسبة غير معرّفة.' : 'أحد المدخلات غير معروف — لا يمكن حساب النسبة.',
     };
   };
   const yieldM = ratio(good, 'yield', 'نسبة المردود', 'الإنتاج الجيد');
-  const scrapRate = ratio(scrap, 'scrapRate', 'نسبة الهالك', 'الهالك');
+  const scrapRate = ratio(scrap, 'scrapRate', 'معدل الخردة', 'كمية الخردة');
   const balOk = iv !== null && good.value !== null && scrap.value !== null;
   const balVal = balOk ? iv! - good.value! - scrap.value! : null;
   const balance: Metric = {
@@ -225,7 +225,7 @@ export function computeLine(ds: Dataset, line: LineId, byId: Map<string, SourceR
   return { input, good, scrap, mold, downtime, yield: yieldM, scrapRate, balance };
 }
 
-export function diffMetric(a: Metric, b: Metric, key: string, label: string, order = 'E-01 − E-02'): Metric {
+export function diffMetric(a: Metric, b: Metric, key: string, label: string, order = 'E-02 − E-01'): Metric {
   const ok = a.value !== null && b.value !== null;
   const pct = a.unit === '%';
   const unit: Unit = pct ? 'pp' : a.unit;

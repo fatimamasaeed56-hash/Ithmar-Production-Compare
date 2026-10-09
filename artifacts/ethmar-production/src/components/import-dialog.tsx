@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Download, FileUp, Lock, Trash2, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -137,8 +137,9 @@ function buildCandidates(files: PFile[]): Candidate[] {
       const where = `${f.name} · صف ${row.startLine}`;
       if (!prev && errors.length === 0) seen.set(sig, where);
       PROD_FIELDS.forEach((k) => {
-        if (hasProd && values[k]?.value == null) warnings.push(`${FIELD_META[k].label}: حقل ناقص أو غير معيّن — غير معروف؛ الصف محفوظ للمراجعة.`);
+        if ((kind === 'production' || hasProd) && values[k]?.value == null) warnings.push(`${FIELD_META[k].label}: حقل ناقص أو غير معيّن — غير معروف؛ الصف محفوظ للمراجعة.`);
       });
+      if (kind === 'downtime' && values.downtime?.value == null) warnings.push('مدة التوقف ناقصة أو غير معيّنة — الصف محفوظ للمراجعة.');
       out.push({
         fileId: f.id,
         errors,
@@ -149,7 +150,8 @@ function buildCandidates(files: PFile[]): Candidate[] {
           line: line ?? lineRaw.trim(),
           kind,
           metadata,
-          rawFields: Object.fromEntries(headers.map((h, i) => [`${i + 1}: ${h}`, row.cells[i] ?? ''])),
+          rawFields: Object.fromEntries(Array.from({ length: Math.max(headers.length, row.cells.length) }, (_, i) =>
+            [`${i + 1}: ${headers[i] ?? 'خلية إضافية بلا عنوان'}`, row.cells[i] ?? ''])),
           values,
           rawText: row.raw,
           physicalRow: row.startLine,
@@ -168,6 +170,15 @@ export function ImportDialog() {
   const { importOpen, setImportOpen, addDataset } = useStore();
   const [, navigate] = useLocation();
   const mappingRef = useRef<HTMLElement>(null);
+  const [mappingTarget, setMappingTarget] = useState<string | null>(null);
+  useEffect(() => {
+    if (!mappingTarget) return;
+    const frame = requestAnimationFrame(() => {
+      mappingRef.current?.scrollIntoView({ block: 'start' });
+      mappingRef.current?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [mappingTarget]);
   const [files, setFiles] = useState<PFile[]>([]);
   const [notices, setNotices] = useState<string[]>([]);
   const [activeFile, setActiveFile] = useState<string | null>(null);
@@ -177,6 +188,7 @@ export function ImportDialog() {
   const seq = useRef(0);
 
   const reset = () => {
+    setMappingTarget(null);
     setFiles([]);
     setNotices([]);
     setActiveFile(null);
@@ -248,15 +260,12 @@ export function ImportDialog() {
     setDtAssoc({ 'E-01': [], 'E-02': [] });
     const needsMapping = next.find((f) => !f.header || ['run_id', 'event_id', 'record_type'].some((name) => !f.header!.cells.includes(name))
       || f.header.cells.some((name) => !Object.values(CANONICAL).includes(name)));
-    if (next.length && !needsMapping && next.every((f) => !f.error)) {
+    if (next.length && !n.length && !needsMapping && next.every((f) => !f.error)) {
       importFiles(next);
     } else if (next.length) {
       setActiveFile(needsMapping?.id ?? next[0].id);
       setNotices((p) => [...p, 'راجع ربط الأعمدة والتنبيهات. كل صف بيانات يبقى متاحًا للمراجعة.']);
-      requestAnimationFrame(() => {
-        mappingRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-        mappingRef.current?.focus();
-      });
+      setMappingTarget(needsMapping?.id ?? next[0].id);
     }
   };
 
@@ -328,8 +337,14 @@ export function ImportDialog() {
         </DialogHeader>
 
         <div className="space-y-5 px-5 py-4">
+          {mappingTarget && (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border bg-secondary p-3 text-sm" role="status">
+              <span>انتقلنا إلى ربط الأعمدة تلقائيًا. راجع الحقول أدناه قبل عرض البيانات.</span>
+              <Button size="sm" variant="outline" onClick={() => setMappingTarget(null)}>العودة إلى اختيار الملفات</Button>
+            </div>
+          )}
           {/* Step 1 */}
-          <section aria-labelledby="st1">
+          <section aria-labelledby="st1" hidden={!!mappingTarget}>
             <h3 id="st1" className="mb-2 flex items-center gap-2 text-sm font-semibold">
               <span className="num grid size-5 place-items-center rounded-full bg-primary text-[11px] text-primary-foreground">1</span>
               الملفات
@@ -397,7 +412,10 @@ export function ImportDialog() {
 
           {/* Step 2 */}
           {af && af.header && (
-            <section ref={mappingRef} tabIndex={-1} aria-labelledby="st2">
+            <section ref={mappingRef} tabIndex={-1} aria-labelledby="st2" data-testid="screen-column-mapping">
+              <p className="mb-3 text-xs text-muted-foreground">{af.name} — {af.rows.length} صف بيانات. الصفوف الناقصة والمكررة محفوظة للمراجعة.</p>
+              {af.error && <p className="mb-3 text-xs text-destructive" role="alert">{af.error}</p>}
+              {mappingTarget && notices.map((notice, i) => <p key={i} className="mb-2 text-xs text-e2" role="alert">{notice}</p>)}
               <h3 id="st2" className="mb-2 flex items-center gap-2 text-sm font-semibold">
                 <span className="num grid size-5 place-items-center rounded-full bg-primary text-[11px] text-primary-foreground">2</span>
                 تعيين الأعمدة

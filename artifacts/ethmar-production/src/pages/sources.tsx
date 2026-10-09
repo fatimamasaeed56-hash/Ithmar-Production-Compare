@@ -1,4 +1,4 @@
-import { Eye } from 'lucide-react';
+import { Eye, FileUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FIELD_META, FIELDS, LINES, type Dataset } from '@/lib/data';
 import { useStore } from '@/lib/store';
@@ -138,7 +138,9 @@ export default function SourcesPage() {
             كل السجلات كما وردت، للقراءة فقط. «—» حقل غير موجود في السجل، و«غير معروف» خلية فارغة.
           </p>
         </div>
-        <Button size="sm" onClick={() => setImportOpen(true)} data-testid="button-sources-import">استيراد CSV</Button>
+      </div>
+      <div className="flex justify-end">
+        <Button variant="default" onClick={() => setImportOpen(true)} data-testid="button-sources-import"><FileUp className="size-4" /> استيراد CSV</Button>
       </div>
       {datasets.map((d) => (
         <DatasetBlock key={d.id} ds={d} />

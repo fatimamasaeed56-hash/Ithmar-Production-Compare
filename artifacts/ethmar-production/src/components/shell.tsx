@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import { FileUp, Rows3, House, LogOut, UserRound } from 'lucide-react';
+import { Rows3, House, LogOut, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -15,7 +15,7 @@ const NAV = [
 
 export function Shell({ children, onLogout, userName }: { children: ReactNode; onLogout: () => void; userName: string }) {
   const [loc] = useLocation();
-  const { datasets, active, setActiveId, setImportOpen } = useStore();
+  const { datasets, active, setActiveId } = useStore();
   return (
     <div dir="rtl" className="min-h-[100dvh]">
       <header className="sticky top-0 z-30 border-b border-t-4 border-t-primary bg-background/95 backdrop-blur">
@@ -55,9 +55,6 @@ export function Shell({ children, onLogout, userName }: { children: ReactNode; o
               <UserRound className="size-4" aria-hidden /><span>حسابي</span>
             </Link>
             <span className="hidden max-w-28 truncate text-xs text-muted-foreground lg:inline" data-testid="user-name-display">{userName}</span>
-            <Button size="sm" variant="outline" onClick={() => setImportOpen(true)} data-testid="button-open-import">
-              <FileUp className="size-4" /> استيراد CSV
-            </Button>
             <Button size="sm" variant="ghost" onClick={onLogout} data-testid="button-logout" aria-label="تسجيل الخروج">
               <LogOut className="size-4" /><span className="hidden sm:inline">خروج</span>
             </Button>

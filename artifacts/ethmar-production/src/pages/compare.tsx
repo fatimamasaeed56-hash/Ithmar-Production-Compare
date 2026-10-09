@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { Info } from 'lucide-react';
+import { FileUp, Info } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { computeLine, diffMetric, LINES, METRIC_ROWS, type LineId, type LineMetrics } from '@/lib/data';
 import { useStore } from '@/lib/store';
 import { MetricButton } from '@/components/bits';
@@ -68,7 +69,7 @@ function LinePanel({ line, m, delay }: { line: LineId; m: LineMetrics; delay: nu
 }
 
 export default function ComparePage() {
-  const { active, byId } = useStore();
+  const { active, byId, setImportOpen } = useStore();
   const lm = useMemo(() => {
     const r = {} as Record<LineId, LineMetrics>;
     LINES.forEach((l) => (r[l] = computeLine(active, l, byId)));
@@ -104,6 +105,11 @@ export default function ComparePage() {
         ))}
       </div>
 
+      <div className="flex justify-end">
+        <Button variant="default" onClick={() => setImportOpen(true)} data-testid="button-open-import">
+          <FileUp className="size-4" /> استيراد CSV
+        </Button>
+      </div>
       <section className="rise overflow-hidden rounded-md border bg-card" style={{ animationDelay: '240ms' }} aria-labelledby="tbl">
         <div className="flex items-center justify-between border-b px-4 py-3">
           <h2 id="tbl" className="text-sm font-semibold">جدول المقارنة</h2>

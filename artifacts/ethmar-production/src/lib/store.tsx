@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
-import { USER_DATASET, type Dataset, type Metric, type SourceRecord } from './data';
+import { USER_DATASET, type Dataset, type Metric, type SourceRecord, type LineId } from './data';
 
 export type TraceTarget = { metric: Metric } | { recordId: string };
 
@@ -8,6 +8,8 @@ type Store = {
   active: Dataset;
   setActiveId: (id: string) => void;
   addDataset: (ds: Dataset) => void;
+  selectRecord: (datasetId: string, line: LineId, recordId: string) => void;
+  toggleDowntime: (datasetId: string, line: LineId, recordId: string) => void;
   byId: Map<string, SourceRecord>;
   trace: TraceTarget | null;
   openTrace: (t: TraceTarget) => void;
@@ -41,6 +43,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     active,
     setActiveId,
     addDataset,
+    selectRecord: (datasetId, line, recordId) => setDatasets((prev) => prev.map((ds) => ds.id !== datasetId ? ds : ({
+      ...ds, selection: { ...ds.selection, [line]: recordId }, downtime: { ...ds.downtime, [line]: [] },
+    }))),
+    toggleDowntime: (datasetId, line, recordId) => setDatasets((prev) => prev.map((ds) => ds.id !== datasetId ? ds : ({
+      ...ds, downtime: { ...ds.downtime, [line]: ds.downtime[line].includes(recordId)
+        ? ds.downtime[line].filter((id) => id !== recordId) : [...ds.downtime[line], recordId] },
+    }))),
     byId,
     trace,
     openTrace: setTrace,

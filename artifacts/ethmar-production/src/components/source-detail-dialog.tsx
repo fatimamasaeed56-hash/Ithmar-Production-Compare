@@ -80,6 +80,19 @@ function RecordCard({ rec, highlight }: { rec: SourceRecord; highlight?: FieldKe
             })}
           </tbody>
         </table>
+        {rec.rawFields && (
+          <details className="mt-3 rounded border p-2 text-xs" open>
+            <summary className="cursor-pointer font-medium">جميع الأعمدة والقيم الخام كما وردت</summary>
+            <dl className="mt-2 grid grid-cols-2 gap-2" dir="ltr">
+              {Object.entries(rec.rawFields).map(([key, value]) => (
+                <div key={key} className="min-w-0">
+                  <dt className="break-all font-medium">{key}</dt>
+                  <dd className="whitespace-pre-wrap break-all">{value || '(فارغ)'}</dd>
+                </div>
+              ))}
+            </dl>
+          </details>
+        )}
         {rec.warnings.length > 0 && (
           <ul className="mt-2 space-y-1 text-[11px] text-e2">
             {rec.warnings.map((w) => (

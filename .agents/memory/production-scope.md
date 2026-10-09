@@ -13,3 +13,9 @@ CSV processing must stay in browser memory only: no upload or persistent saving,
 **Why:** The user explicitly requires this scope for this version.
 
 **How to apply:** Show E-02 minus E-01 for the requested scrap-rate and mold-change summaries: +5 percentage points and +2 hours for the supplied records. Keep the 45-minute unplanned stop separate and make no causal inference.
+
+The CSV intake must use PapaParse with header:true and skipEmptyLines:'greedy'. Entirely empty lines, including the trailing newline, are not incomplete data records. Missing values within data rows remain visible with warnings. Recognized run_id, event_id, record_type headers and an error-free parse trigger direct import; alternate headers trigger automatic navigation to column mapping. The same file can be chosen again.
+
+**Why:** The user explicitly specified this import contract and distinguished blank lines from incomplete records.
+
+**How to apply:** Preserve original physical row positions and raw values; do not treat skipped blank lines as records or renumber source rows after skipping them.

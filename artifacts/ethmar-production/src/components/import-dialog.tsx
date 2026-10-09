@@ -3,14 +3,29 @@ import { AlertTriangle, CheckCircle2, Download, FileUp, Lock, Trash2, X } from '
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { parseCsv, type CsvRow } from '@/lib/csv';
-import { FIELD_META, FIELDS, fmtNum, LINES, PROD_FIELDS, type Cell, type Dataset, type FieldKey, type LineId, type SourceRecord } from '@/lib/data';
+import { FIELD_META, FIELDS, fmtNum, LINES, PROD_FIELDS, type Cell, type FieldKey, type LineId, type SourceRecord } from '@/lib/data';
 import { useStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
+import { useLocation } from 'wouter';
 
-type MapKey = 'line' | FieldKey;
-const MAP_KEYS: MapKey[] = ['line', ...FIELDS];
+type MetaKey = 'event_id' | 'record_type' | 'order_id' | 'machine' | 'mold_id' | 'shift';
+type MapKey = 'line' | FieldKey | MetaKey;
+const META_KEYS: MetaKey[] = ['event_id', 'record_type', 'order_id', 'machine', 'mold_id', 'shift'];
+const MAP_KEYS: MapKey[] = ['line', ...META_KEYS, ...FIELDS];
+const CANONICAL: Record<MapKey, string> = {
+  line: 'run_id', event_id: 'event_id', record_type: 'record_type',
+  input: 'input_kg', good: 'good_output_kg', scrap: 'scrap_kg',
+  mold: 'mold_change_hours', downtime: 'downtime_minutes',
+  order_id: 'order_id', machine: 'machine', mold_id: 'mold', shift: 'shift',
+};
 const MAP_LABEL: Record<MapKey, string> = {
-  line: 'معرّف الخط (إلزامي)',
+  line: 'run_id — معرّف التشغيل (أساسي)',
+  event_id: 'event_id — معرّف الحدث (أساسي)',
+  record_type: 'record_type — نوع السجل (أساسي)',
+  order_id: 'order_id — الطلب',
+  machine: 'machine — الماكينة',
+  mold_id: 'mold — القالب',
+  shift: 'shift — الوردية',
   input: 'المدخل — كجم',
   good: 'الإنتاج الجيد — كجم',
   scrap: 'الهالك — كجم',
@@ -18,11 +33,17 @@ const MAP_LABEL: Record<MapKey, string> = {
   downtime: 'التوقف غير المخطط — دقائق',
 };
 const GUESS: Record<MapKey, RegExp> = {
-  line: /^(line(_?id)?|خط|الخط|رقم الخط|معرف الخط|machine|extruder)/i,
+  line: /^(run_id|line(_?id)?|خط|الخط|رقم الخط|معرف الخط)/i,
+  event_id: /^(event_id|معرف الحدث)$/i,
+  record_type: /^(record_type|نوع السجل)$/i,
+  order_id: /^(order_id|رقم الطلب)$/i,
+  machine: /^(machine|الماكينة)$/i,
+  mold_id: /^(mold|القالب)$/i,
+  shift: /^(shift|الوردية)$/i,
   input: /(input|feed|مدخل|المدخل|خامة)/i,
   good: /(good|output|جيد|الجيد|انتاج|إنتاج)/i,
   scrap: /(scrap|waste|هالك|الهالك|تالف)/i,
-  mold: /(mold|mould|قالب|القالب)/i,
+  mold: /(mold_change_hours|mould_change|تغيير القالب)/i,
   downtime: /(downtime|stop|توقف|التوقف)/i,
 };
 
@@ -31,7 +52,7 @@ type PFile = {
   name: string;
   size: number;
   text: string;
-  delimiter: ',' | ';';
+  delimiter: string;
   hadBom: boolean;
   error: string | null;
   header: CsvRow | null;
@@ -46,7 +67,7 @@ type Candidate = {
   fileId: string;
 };
 
-const TEMPLATE = 'line_id,input_kg,good_output_kg,scrap_kg,mold_change_hours,unplanned_downtime_minutes\r\n';
+const TEMPLATE = 'run_id,event_id,record_type,input_kg,good_output_kg,scrap_kg,mold_change_hours,downtime_minutes,order_id,machine,mold,shift\r\n';
 
 function normDigits(s: string) {
   return s.replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
@@ -61,7 +82,8 @@ function guessMapping(headers: string[]): Record<MapKey, number> {
   const m = {} as Record<MapKey, number>;
   const used = new Set<number>();
   MAP_KEYS.forEach((k) => {
-    const idx = headers.findIndex((h, i) => !used.has(i) && GUESS[k].test(h.trim()));
+    const exact = headers.findIndex((h) => h.trim().toLowerCase() === CANONICAL[k]);
+    const idx = exact >= 0 ? exact : headers.findIndex((h, i) => !used.has(i) && GUESS[k].test(h.trim()));
     m[k] = idx;
     if (idx >= 0) used.add(idx);
   });
@@ -72,18 +94,22 @@ function buildCandidates(files: PFile[]): Candidate[] {
   const out: Candidate[] = [];
   const seen = new Map<string, string>();
   files.forEach((f) => {
-    if (!f.header || f.error) return;
+    if (!f.header) return;
     const headers = f.header.cells;
     f.rows.forEach((row) => {
       const errors: string[] = [];
       const warnings: string[] = [];
+      if (f.error) warnings.push(`تنبيه تحليل الملف: ${f.error}`);
       if (row.cells.length !== headers.length)
         errors.push(`عدد الخلايا (${row.cells.length}) لا يطابق عدد الأعمدة في الرأس (${headers.length}).`);
       const lineRaw = f.mapping.line >= 0 ? (row.cells[f.mapping.line] ?? '') : '';
       const line = normLine(lineRaw);
-      if (f.mapping.line < 0) errors.push('عمود معرّف الخط غير مُعيَّن.');
-      else if (lineRaw.trim() === '') errors.push('معرّف الخط فارغ.');
-      else if (!line) errors.push(`معرّف الخط "${lineRaw.trim()}" غير مدعوم — المقبول E-01 أو E-02 فقط.`);
+      if (lineRaw.trim() === '') warnings.push('معرّف التشغيل ناقص؛ الصف محفوظ للمراجعة.');
+      else if (!line) warnings.push('هذا التشغيل محفوظ للمراجعة لكنه ليس E-01 أو E-02.');
+      const metadata = Object.fromEntries(META_KEYS.map((k) => [CANONICAL[k], f.mapping[k] >= 0 ? row.cells[f.mapping[k]] ?? '' : '']));
+      for (const k of ['event_id', 'record_type']) {
+        if (!metadata[k].trim()) warnings.push(`${k}: قيمة ناقصة — الصف محفوظ للمراجعة.`);
+      }
       const values: Partial<Record<FieldKey, Cell>> = {};
       FIELDS.forEach((k) => {
         const ci = f.mapping[k];
@@ -99,8 +125,13 @@ function buildCandidates(files: PFile[]): Candidate[] {
       });
       const hasProd = PROD_FIELDS.some((k) => values[k]?.value != null);
       const hasDt = values.downtime?.value != null;
-      if (!hasProd && !hasDt && errors.length === 0) errors.push('الصف لا يحتوي أي قيمة رقمية — لا يمكن تصنيفه.');
-      const sig = `${line}|${FIELDS.map((k) => values[k]?.value ?? '∅').join('|')}`;
+      if (!hasProd && !hasDt) warnings.push('الصف لا يحتوي قيم قياس؛ محفوظ للمراجعة دون تعويضها بأصفار.');
+      const recordType = metadata.record_type.trim().toLowerCase();
+      const kind: SourceRecord['kind'] = /^(production|run|إنتاج|تشغيل)$/.test(recordType) ? 'production'
+        : /^(downtime|unplanned_downtime|stop|توقف)$/.test(recordType) ? 'downtime'
+        : !recordType ? (hasProd ? 'production' : hasDt ? 'downtime' : 'unknown') : 'unknown';
+      if (kind === 'unknown') warnings.push('نوع السجل غير معروف؛ لم يدخل المقارنة.');
+      const sig = `${lineRaw}|${metadata.event_id}|${recordType}|${FIELDS.map((k) => values[k]?.value ?? '∅').join('|')}`;
       const prev = seen.get(sig);
       if (prev && errors.length === 0) warnings.push(`سجل مطابق تماماً لـ ${prev}. لم يُدمج ولم يُحذف — اختر صفاً واحداً فقط.`);
       const where = `${f.name} · صف ${row.startLine}`;
@@ -115,8 +146,10 @@ function buildCandidates(files: PFile[]): Candidate[] {
           id: `${f.id}:r${row.startLine}`,
           datasetId: '',
           origin: 'csv',
-          line: line ?? 'E-01',
-          kind: hasProd ? 'production' : 'downtime',
+          line: line ?? lineRaw.trim(),
+          kind,
+          metadata,
+          rawFields: Object.fromEntries(headers.map((h, i) => [`${i + 1}: ${h}`, row.cells[i] ?? ''])),
           values,
           rawText: row.raw,
           physicalRow: row.startLine,
@@ -133,6 +166,8 @@ function buildCandidates(files: PFile[]): Candidate[] {
 
 export function ImportDialog() {
   const { importOpen, setImportOpen, addDataset } = useStore();
+  const [, navigate] = useLocation();
+  const mappingRef = useRef<HTMLElement>(null);
   const [files, setFiles] = useState<PFile[]>([]);
   const [notices, setNotices] = useState<string[]>([]);
   const [activeFile, setActiveFile] = useState<string | null>(null);
@@ -149,16 +184,46 @@ export function ImportDialog() {
     setDtAssoc({ 'E-01': [], 'E-02': [] });
   };
 
+  const importFiles = (incoming: PFile[], manual = false) => {
+    seq.current += 1;
+    const dsId = `csv-${seq.current}`;
+    const candidates = buildCandidates(incoming);
+    const records = candidates.map(({ rec, errors }) => ({
+      ...rec, id: `${dsId}:${rec.id}`, datasetId: dsId,
+      warnings: [...rec.warnings, ...errors],
+    }));
+    const selected = {} as Record<LineId, string>;
+    const downtime = {} as Record<LineId, string[]>;
+    LINES.forEach((line) => {
+      const prods = records.filter((r) => r.line === line && r.kind === 'production');
+      const chosen = manual && selection[line] ? `${dsId}:${selection[line]}` : '';
+      selected[line] = prods.some((r) => r.id === chosen) ? chosen : prods.length === 1 ? prods[0].id : '';
+      // Events require an explicit user association, never an automatic sum.
+      downtime[line] = manual ? (dtAssoc[line] ?? []).map((id) => `${dsId}:${id}`) : [];
+    });
+    addDataset({
+      id: dsId, origin: 'csv', title: `استيراد CSV — ${incoming.map((f) => f.name).join('، ')}`,
+      files: incoming.map((f) => ({ name: f.name, size: f.size, delimiter: f.delimiter, dataRows: f.rows.length, hadBom: f.hadBom })),
+      records, selection: selected, downtime,
+    });
+    reset();
+    setImportOpen(false);
+    navigate('/sources');
+  };
+
   const onFiles = async (list: FileList | null) => {
     if (!list) return;
+    const chosenFiles = Array.from(list);
+    if (inputRef.current) inputRef.current.value = '';
     const next = [...files];
     const n: string[] = [];
-    for (const file of Array.from(list)) {
-      const text = await file.text();
-      if (next.some((p) => p.text === text)) {
-        n.push(`الملف "${file.name}" مطابق في المحتوى لملف مضاف مسبقاً — لم يُضف مرة ثانية لتجنب تكرار السجلات.`);
-        continue;
-      }
+    for (const file of chosenFiles) {
+      let text: string;
+      try { text = await file.text(); }
+      catch { n.push(`تعذّرت قراءة ${file.name}؛ يمكنك اختياره مجددًا.`); continue; }
+      // Re-selecting replaces only the pending file, not any imported source.
+      const previous = next.findIndex((p) => p.name === file.name);
+      if (previous >= 0) next.splice(previous, 1);
       const res = parseCsv(text);
       const header = res.rows[0] ?? null;
       seq.current += 1;
@@ -181,7 +246,18 @@ export function ImportDialog() {
     if (!activeFile && next[0]) setActiveFile(next[0].id);
     setSelection({});
     setDtAssoc({ 'E-01': [], 'E-02': [] });
-    if (inputRef.current) inputRef.current.value = '';
+    const needsMapping = next.find((f) => !f.header || ['run_id', 'event_id', 'record_type'].some((name) => !f.header!.cells.includes(name))
+      || f.header.cells.some((name) => !Object.values(CANONICAL).includes(name)));
+    if (next.length && !needsMapping && next.every((f) => !f.error)) {
+      importFiles(next);
+    } else if (next.length) {
+      setActiveFile(needsMapping?.id ?? next[0].id);
+      setNotices((p) => [...p, 'راجع ربط الأعمدة والتنبيهات. كل صف بيانات يبقى متاحًا للمراجعة.']);
+      requestAnimationFrame(() => {
+        mappingRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        mappingRef.current?.focus();
+      });
+    }
   };
 
   const candidates = useMemo(() => buildCandidates(files), [files]);
@@ -199,45 +275,27 @@ export function ImportDialog() {
 
   const blockers: string[] = [];
   if (files.length === 0) blockers.push('أضف ملف CSV واحداً على الأقل.');
-  fileErrors.forEach((f) => blockers.push(`${f.name}: ${f.error}`));
-  if (invalid.length) blockers.push(`${invalid.length} صف يحتوي أخطاء — صحّح الملف أو التعيين ثم أعد المحاولة.`);
-  files.forEach((f) => !f.error && f.mapping.line < 0 && blockers.push(`${f.name}: عيّن عمود معرّف الخط.`));
-  if (files.length && !fileErrors.length && !invalid.length)
-    LINES.forEach((l) => {
-      if (prodByLine(l).length === 0) blockers.push(`لا يوجد صف تشغيل صالح للخط ${l}.`);
-      else if (!effSel(l)) blockers.push(`اختر صف تشغيل واحداً للخط ${l} (يوجد ${prodByLine(l).length} صفوف).`);
-    });
+  files.forEach((f) => {
+    if (!f.header) blockers.push(`${f.name}: لا يوجد رأس أعمدة.`);
+    for (const key of ['line', 'event_id', 'record_type'] as const) {
+      if (f.mapping[key] < 0) blockers.push(`${f.name}: عيّن ${CANONICAL[key]}.`);
+    }
+  });
 
   const setMap = (fid: string, k: MapKey, idx: number) => {
-    setFiles((p) => p.map((f) => (f.id === fid ? { ...f, mapping: { ...f.mapping, [k]: idx } } : f)));
+    setFiles((p) => p.map((f) => {
+      if (f.id !== fid) return f;
+      const mapping = { ...f.mapping, [k]: idx };
+      if (idx >= 0) MAP_KEYS.forEach((other) => { if (other !== k && mapping[other] === idx) mapping[other] = -1; });
+      return { ...f, mapping };
+    }));
     setSelection({});
     setDtAssoc({ 'E-01': [], 'E-02': [] });
   };
 
   const commit = () => {
     if (blockers.length) return;
-    seq.current += 1;
-    const dsId = `csv-${seq.current}-${files.map((f) => f.id).join('')}`;
-    const records = valid.map((c) => ({ ...c.rec, id: `${dsId}:${c.rec.id}`, datasetId: dsId }));
-    const sel = {} as Record<LineId, string>;
-    const dt = {} as Record<LineId, string[]>;
-    LINES.forEach((l) => {
-      sel[l] = `${dsId}:${effSel(l)}`;
-      const allowed = new Set(dtByLine(l).map((c) => c.rec.id));
-      dt[l] = dtAssoc[l].filter((id) => allowed.has(id)).map((id) => `${dsId}:${id}`);
-    });
-    const ds: Dataset = {
-      id: dsId,
-      origin: 'csv',
-      title: `استيراد CSV — ${files.map((f) => f.name).join('، ')}`,
-      files: files.map((f) => ({ name: f.name, size: f.size, delimiter: f.delimiter, dataRows: f.rows.length, hadBom: f.hadBom })),
-      records,
-      selection: sel,
-      downtime: dt,
-    };
-    addDataset(ds);
-    reset();
-    setImportOpen(false);
+    importFiles(files, true);
   };
 
   const downloadTemplate = () => {
@@ -265,7 +323,7 @@ export function ImportDialog() {
           <DialogTitle className="text-base">استيراد سجلات الإنتاج من CSV</DialogTitle>
           <DialogDescription className="flex items-start gap-1.5 text-xs">
             <Lock className="mt-0.5 size-3.5 shrink-0" aria-hidden />
-            تُقرأ الملفات وتُعالج محلياً داخل هذا المتصفح فقط — لا تُرفع إلى أي خادم، وتبقى طوال هذه الجلسة فقط. تُستبدل البيانات المعروضة فقط بعد نجاح الاستيراد، وتبقى بيانات رسالة المستخدم متاحة للرجوع إليها.
+            يُقرأ الملف محليًا داخل المتصفح فقط ولا يُرسل ولا يُحفظ. تبقى البيانات مؤقتًا في الذاكرة وتزول عند تحديث الصفحة. لا اتصال بنظام ERP.
           </DialogDescription>
         </DialogHeader>
 
@@ -297,7 +355,7 @@ export function ImportDialog() {
                 <li>الصف الأول رؤوس الأعمدة. الحقول بين علامتي اقتباس قد تحتوي فواصل أو أسطراً جديدة.</li>
                 <li>كل صف سجل واحد: تشغيل إنتاج (مدخل/جيد/هالك/قالب) أو حدث توقف غير مخطط (دقائق فقط). الخطوط المقبولة: E-01 وE-02.</li>
                 <li>الأرقام غير سالبة، بالنقطة العشرية ودون فواصل آلاف. الخلية الفارغة تعني «غير معروف» وليست صفراً.</li>
-                <li>لا يُحذف أي صف بصمت: الصفوف الخاطئة تُعرض مع رقم صفها الفعلي ويُمنع الاستيراد حتى تصحيحها.</li>
+                <li>تُتجاهل الأسطر الفارغة تمامًا فقط. الصفوف الناقصة أو المكررة تبقى ظاهرة مع تنبيه ورقم الصف والقيم الخام.</li>
               </ul>
               <pre dir="ltr" className="num mt-2 overflow-x-auto rounded-sm bg-background px-2 py-1 text-start text-[11px]">{TEMPLATE.trim()}</pre>
             </details>
@@ -315,7 +373,7 @@ export function ImportDialog() {
                     <span className="num text-muted-foreground">{fmtNum(f.size)} B</span>
                     <span className="text-muted-foreground">
                       فاصل <span className="num">{f.delimiter}</span> · {f.hadBom ? 'BOM' : 'بدون BOM'} · <span className="num">{f.rows.length}</span> صف بيانات
-                      {f.blankLines ? ` · ${f.blankLines} سطر فارغ محفوظ للمراجعة ضمن الأخطاء` : ''}
+                      {f.blankLines ? ' · تم تجاهل الأسطر الخالية فقط' : ''}
                     </span>
                     {f.error && <span className="text-destructive">{f.error}</span>}
                     <button
@@ -338,15 +396,15 @@ export function ImportDialog() {
           </section>
 
           {/* Step 2 */}
-          {af && af.header && !af.error && (
-            <section aria-labelledby="st2">
+          {af && af.header && (
+            <section ref={mappingRef} tabIndex={-1} aria-labelledby="st2">
               <h3 id="st2" className="mb-2 flex items-center gap-2 text-sm font-semibold">
                 <span className="num grid size-5 place-items-center rounded-full bg-primary text-[11px] text-primary-foreground">2</span>
                 تعيين الأعمدة
               </h3>
               {files.length > 1 && (
                 <div role="tablist" className="mb-2 flex flex-wrap gap-1">
-                  {files.filter((f) => !f.error).map((f) => (
+                  {files.map((f) => (
                     <button
                       key={f.id}
                       role="tab"

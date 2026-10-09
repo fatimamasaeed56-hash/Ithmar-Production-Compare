@@ -28,8 +28,10 @@ export type SourceRecord = {
   id: string;
   datasetId: string;
   origin: Origin;
-  line: LineId;
-  kind: 'production' | 'downtime';
+  line: string;
+  kind: 'production' | 'downtime' | 'unknown';
+  rawFields?: Record<string, string>;
+  metadata?: Record<string, string>;
   values: Partial<Record<FieldKey, Cell>>;
   rawText: string;
   physicalRow: number | null;

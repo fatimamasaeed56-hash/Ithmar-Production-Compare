@@ -1,12 +1,12 @@
 import { Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { FIELD_META, FIELDS, fmtNum, type Dataset } from '@/lib/data';
+import { FIELD_META, FIELDS, fmtNum, LINES, type Dataset } from '@/lib/data';
 import { useStore } from '@/lib/store';
 import { OriginBadge, Unknown } from '@/components/bits';
 import { cn } from '@/lib/utils';
 
 function DatasetBlock({ ds }: { ds: Dataset }) {
-  const { active, setActiveId, openTrace } = useStore();
+  const { active, setActiveId, openTrace, selectRecord, toggleDowntime } = useStore();
   const isActive = active.id === ds.id;
   const status = (id: string) => {
     if (Object.values(ds.selection).includes(id)) return { t: 'تشغيل مختار', c: 'bg-primary text-primary-foreground' };
@@ -35,6 +35,32 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
           ))}
         </ul>
       )}
+      {ds.origin === 'csv' && (
+        <div className="grid gap-3 border-b p-4 md:grid-cols-2">
+          {LINES.map((line) => (
+            <div key={line} className="space-y-2 text-xs">
+              <label className="block">
+                تشغيل المقارنة {line} — اختر صفًا واحدًا دون جمع السجلات
+                <select className="mt-1 block w-full rounded border bg-card p-2" value={ds.selection[line]}
+                  onChange={(e) => selectRecord(ds.id, line, e.target.value)}>
+                  <option value="">غير محدد / غير متوفر</option>
+                  {ds.records.filter((r) => r.line === line && r.kind === 'production').map((r) => (
+                    <option key={r.id} value={r.id}>{r.fileName} — صف {r.physicalRow} — {r.metadata?.event_id || 'معرّف الحدث ناقص'}</option>
+                  ))}
+                </select>
+              </label>
+              <p>أحداث التوقف منفصلة؛ اربط فقط ما يخص التشغيل المختار:</p>
+              {ds.records.filter((r) => r.line === line && (r.kind === 'downtime' || r.id === ds.selection[line]) && r.values.downtime?.value != null).map((r) => (
+                <label key={r.id} className="flex items-center gap-2">
+                  <input type="checkbox" disabled={!ds.selection[line]} checked={ds.downtime[line].includes(r.id)}
+                    onChange={() => toggleDowntime(ds.id, line, r.id)} />
+                  {r.fileName} — صف {r.physicalRow} — {r.values.downtime?.value} دقيقة
+                </label>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[760px] text-xs">
           <thead>
@@ -54,9 +80,11 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
               const s = status(r.id);
               return (
                 <tr key={r.id} className="border-b last:border-0 hover:bg-muted/30" data-testid={`row-record-${r.id}`}>
-                  <td className="px-3 py-2"><span className={cn('rounded-sm px-1.5 py-0.5 text-[10px] whitespace-nowrap', s.c)}>{s.t}</span></td>
+                  <td className="px-3 py-2"><span className={cn('rounded-sm px-1.5 py-0.5 text-[10px] whitespace-nowrap', s.c)}>{s.t}</span>
+                    {r.warnings.length > 0 && <details className="mt-1 min-w-36 text-e2"><summary className="cursor-pointer">تنبيه للمراجعة ({r.warnings.length})</summary><ul>{r.warnings.map((w, i) => <li key={i}>{w}</li>)}</ul></details>}
+                  </td>
                   <td className={cn('num px-3 py-2 text-start font-semibold', r.line === 'E-01' ? 'text-e1' : 'text-e2')}>{r.line}</td>
-                  <td className="px-3 py-2 whitespace-nowrap">{r.kind === 'production' ? 'تشغيل' : 'حدث توقف'}</td>
+                  <td className="px-3 py-2 whitespace-nowrap">{r.kind === 'production' ? 'تشغيل' : r.kind === 'downtime' ? 'حدث توقف' : 'غير معروف'}</td>
                   <td className="px-3 py-2">
                     {r.fileName ? (
                       <span className="break-all">{r.fileName} · <span className="num">{r.physicalRow}</span></span>

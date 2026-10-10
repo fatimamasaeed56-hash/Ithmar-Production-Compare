@@ -5,9 +5,10 @@ import { useStore } from '@/lib/store';
 import { OriginBadge, MetricButton } from '@/components/bits';
 import { cn } from '@/lib/utils';
 import { DataIssues } from '@/components/data-issues';
+import { Textarea } from '@/components/ui/textarea';
 
 function DatasetBlock({ ds }: { ds: Dataset }) {
-  const { active, setActiveId, openTrace, selectRecord, toggleDowntime } = useStore();
+  const { active, setActiveId, openTrace, selectRecord, toggleDowntime, notes, setNote } = useStore();
   const isActive = active.id === ds.id;
   const status = (id: string) => {
     if (Object.values(ds.selection).includes(id)) return { t: 'تشغيل مختار', c: 'bg-primary text-primary-foreground' };
@@ -125,6 +126,25 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
           </tbody>
         </table>
       </div>
+      {ds.origin === 'csv' && (
+        <div className="border-t bg-muted/20 px-4 py-3">
+          <label htmlFor={`notes-${ds.id}`} className="mb-2 block text-sm font-medium">ملاحظات</label>
+          <Textarea
+            id={`notes-${ds.id}`}
+            data-testid={`notes-${ds.id}`}
+            aria-describedby={`notes-help-${ds.id}`}
+            rows={2}
+            dir="auto"
+            value={notes[ds.id] ?? ''}
+            onChange={(event) => setNote(ds.id, event.target.value)}
+            placeholder="اكتب ملاحظاتك هنا…"
+            className="min-h-20 resize-y bg-background text-start"
+          />
+          <p id={`notes-help-${ds.id}`} className="mt-1.5 text-[11px] text-muted-foreground">
+            ملاحظات مؤقتة لهذا الجدول؛ لا تغيّر بيانات المصدر ولا تُرسل أو تُحفظ، وتزول عند تحديث الصفحة أو تسجيل الخروج.
+          </p>
+        </div>
+      )}
     </section>
   );
 }

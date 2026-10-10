@@ -8,6 +8,8 @@ type Store = {
   active: Dataset;
   setActiveId: (id: string) => void;
   addDataset: (ds: Dataset) => void;
+  notes: Record<string, string>;
+  setNote: (datasetId: string, text: string) => void;
   selectRecord: (datasetId: string, line: LineId, recordId: string) => void;
   toggleDowntime: (datasetId: string, line: LineId, recordId: string) => void;
   byId: Map<string, SourceRecord>;
@@ -25,6 +27,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [activeId, setActiveId] = useState(USER_DATASET.id);
   const [trace, setTrace] = useState<TraceTarget | null>(null);
   const [importOpen, setImportOpen] = useState(false);
+  const [notes, setNotes] = useState<Record<string, string>>({});
 
   const byId = useMemo(() => {
     const m = new Map<string, SourceRecord>();
@@ -43,6 +46,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     active,
     setActiveId,
     addDataset,
+    notes,
+    setNote: (datasetId, text) => setNotes((previous) => ({ ...previous, [datasetId]: text })),
     selectRecord: (datasetId, line, recordId) => setDatasets((prev) => prev.map((ds) => ds.id !== datasetId ? ds : ({
       ...ds, selection: { ...ds.selection, [line]: recordId }, downtime: { ...ds.downtime, [line]: [] },
     }))),

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<records demo="true">
+  <record>
+    <run_id>E-01</run_id><event_id>DEMO-EXT-01</event_id><record_type>production</record_type>
+    <input_kg>1000</input_kg><good_output_kg>950</good_output_kg><scrap_kg>50</scrap_kg><mold_change_hours>4</mold_change_hours>
+    <downtime_minutes/><order_id/><machine/><mold/><shift/>
+  </record>
+  <record>
+    <run_id>E-02</run_id><event_id>DEMO-EXT-02</event_id><record_type>production</record_type>
+    <input_kg>1000</input_kg><good_output_kg>900</good_output_kg><scrap_kg>100</scrap_kg><mold_change_hours>6</mold_change_hours>
+    <downtime_minutes/><order_id/><machine/><mold/><shift/>
+  </record>
+  <record>
+    <run_id>E-02</run_id><event_id>DEMO-EXT-03</event_id><record_type>downtime</record_type>
+    <input_kg/><good_output_kg/><scrap_kg/><mold_change_hours/><downtime_minutes>45</downtime_minutes>
+    <order_id/><machine/><mold/><shift/>
+  </record>
+</records>

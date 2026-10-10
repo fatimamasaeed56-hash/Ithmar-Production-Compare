@@ -28,3 +28,171 @@ mtime_ms = 1791579720894
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/ff2e88cb-a2dc-4d69-bb94-e7679dfa6d55/70dd5c76-a883-468d-9c37-0fa159b0dce9"
 storage_version_token = "1791579734050363"
 content_type = "text/csv"
+
+[[outputs]]
+id = "FHxkdqsZs7irMoCVHDIY6"
+uri = "file://attached_assets/csv-tests/DEMO_01_valid.csv"
+type = "table"
+title = "١ — ملف صحيح: المقارنة الأساسية"
+description = "E-01: خردة 5% وتغيير قالب 4 ساعات. E-02: خردة 10% وتغيير قالب 6 ساعات، وتوقف منفصل 45 دقيقة."
+logical_id = "141b5d7c-cc81-4901-8d93-5bc4361162b8"
+content_hash = "sha256:dcf8236ec0c75dfb07952d8569b194b9f2c9e6d7c40b6ed4f2c20f4e009f0eae"
+size = 250
+mtime_ms = 1791658812716
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/141b5d7c-cc81-4901-8d93-5bc4361162b8/e72b29b0-485c-4e91-87fe-337968dec046"
+storage_version_token = "1791658838245742"
+content_type = "text/csv"
+
+[[outputs]]
+id = "7Wh6Vc9u0kz2P_eQdQFqI"
+uri = "file://attached_assets/csv-tests/DEMO_02_valid_different.csv"
+type = "table"
+title = "٢ — ملف صحيح: بيانات مختلفة"
+description = "بيانات DEMO إضافية: خردة 5% مقابل 8%، وتغيير القالب 3 مقابل 5 ساعات."
+logical_id = "4e2dd8a8-b10b-44f9-a8de-63e46ae4d284"
+content_hash = "sha256:ecd8dd0fe1483ffb8f2f0c156cf848f9dcfcab764f01f0f69bfc0902e1aa8b60"
+size = 253
+mtime_ms = 1791658814100
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/4e2dd8a8-b10b-44f9-a8de-63e46ae4d284/88df9d96-efa8-46d0-9d67-6f14610d5fda"
+storage_version_token = "1791658838778201"
+content_type = "text/csv"
+
+[[outputs]]
+id = "6KU1_2W863z7opV2BydUV"
+uri = "file://attached_assets/csv-tests/DEMO_03_missing_values.csv"
+type = "table"
+title = "٣ — خطأ: قيم ناقصة"
+description = "الصف 3: معرّف الحدث وكمية الخردة ناقصان. الصف 4: مدة التوقف ناقصة. يجب إبقاء الصفوف مع التنبيه."
+logical_id = "41d892ab-ee58-48b6-9fcc-cc17901f14ec"
+content_hash = "sha256:f3768e0cf8c1edd4b761c2b5c7f58869b7d888c56573d930b2d2d7387dd6bf59"
+size = 236
+mtime_ms = 1791658824468
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/41d892ab-ee58-48b6-9fcc-cc17901f14ec/2b340c93-7500-45f7-8f06-e49e91d1527b"
+storage_version_token = "1791658839260011"
+content_type = "text/csv"
+
+[[outputs]]
+id = "7yFc0yhkLLy45oQlV6CS1"
+uri = "file://attached_assets/csv-tests/DEMO_04_duplicate_rows.csv"
+type = "table"
+title = "٤ — خطأ: صف مكرر"
+description = "الصفان 3 و4 متطابقان. لاختبار تنبيه تكرار الصفوف دون حذفها."
+logical_id = "822c00bf-b1a7-4545-a91e-6f044f82c575"
+content_hash = "sha256:99fbd888b1d44b8ab76cc6dd28e0a78727190157291d0d6b52673bf48ef549d2"
+size = 261
+mtime_ms = 1791658816788
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/822c00bf-b1a7-4545-a91e-6f044f82c575/c9e55cda-dc19-46a9-a28e-35c92cf9bc83"
+storage_version_token = "1791658839774369"
+content_type = "text/csv"
+
+[[outputs]]
+id = "NzzcA9lQNYocDq5hzFeZD"
+uri = "file://attached_assets/csv-tests/DEMO_05_invalid_numbers.csv"
+type = "table"
+title = "٥ — خطأ: أرقام غير صالحة"
+description = "خردة سالبة في الصف 2، نص abc بدل وقت القالب في الصف 3، وتوقف سالب في الصف 4."
+logical_id = "01dd875c-d120-47e7-8ec2-d93c238c1547"
+content_hash = "sha256:495f905d9c92ada67081c0fab3ef5433607f17aa2112042e42947792728c3e46"
+size = 254
+mtime_ms = 1791658818328
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/01dd875c-d120-47e7-8ec2-d93c238c1547/699b0cdf-ea41-4dd1-bbd4-e8fb9bb9d89e"
+storage_version_token = "1791658840290270"
+content_type = "text/csv"
+
+[[outputs]]
+id = "Vout_V-IlphoI_Xb7U70p"
+uri = "file://attached_assets/csv-tests/DEMO_06_column_mapping.csv"
+type = "table"
+title = "٦ — اختبار ربط الأعمدة"
+description = "اربط demo_run بـrun_id وdemo_event بـevent_id وdemo_type بـrecord_type. بقية البيانات صحيحة."
+logical_id = "3114fdaf-00e3-4d29-8719-28007aae263f"
+content_hash = "sha256:10b02349309acff7b1d83ad6aaa5081de11f96477bb8588b7da971e4457202aa"
+size = 217
+mtime_ms = 1791658819536
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/3114fdaf-00e3-4d29-8719-28007aae263f/228e2acb-fe43-4b0b-8644-bcf17e881b71"
+storage_version_token = "1791658840857589"
+content_type = "text/csv"
+
+[[outputs]]
+id = "1y89Mx_43CHmMqXbU58vf"
+uri = "file://attached_assets/csv-tests/DEMO_07_csv_structure_error.csv"
+type = "table"
+title = "٧ — خطأ في بنية CSV"
+description = "الصف 3 يحتوي خلية إضافية عن عدد العناوين؛ لاختبار خطأ التحليل ومراجعة الربط."
+logical_id = "d23d785a-0fec-4a4b-88d0-80277e598bad"
+content_hash = "sha256:4cf2c5ac3ea0bf2d96831d55029bc05191a1a23c7c66e9f4da2a578d4fb8aa66"
+size = 231
+mtime_ms = 1791658820796
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/d23d785a-0fec-4a4b-88d0-80277e598bad/89b36a37-c509-4d25-8eec-bc59c2bf4230"
+storage_version_token = "1791658841397143"
+content_type = "text/csv"
+
+[[outputs]]
+id = "x0dxAy44_OIP6bVpUwuZD"
+uri = "file://attached_assets/extension-tests/DEMO_extension_test.CSV"
+type = "table"
+title = "ملف تجربة — CSV"
+description = "ملف CSV صحيح بامتداد أحرف كبيرة؛ يفترض أن يقبله النظام."
+logical_id = "fcf1c9fd-2b04-469f-8115-c89d9914eb46"
+content_hash = "sha256:e7ad1a485b51ee4b08ae8aa6202d74785be76863f1bd53e209186316aa27b3ba"
+size = 256
+mtime_ms = 1791658862012
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/fcf1c9fd-2b04-469f-8115-c89d9914eb46/0a2679e8-4a1a-431e-a32e-c637c86339b9"
+storage_version_token = "1791658886045609"
+content_type = "text/csv"
+
+[[outputs]]
+id = "lF6AZbBY1yvbpcSuCpq2t"
+uri = "file://attached_assets/extension-tests/DEMO_extension_test.txt"
+type = "text"
+title = "ملف تجربة — txt"
+description = "نفس محتوى CSV بامتداد TXT؛ يفترض رفضه لأن الامتداد غير مدعوم."
+logical_id = "9386703f-a637-475f-b53c-9e05e45ab37d"
+content_hash = "sha256:e7ad1a485b51ee4b08ae8aa6202d74785be76863f1bd53e209186316aa27b3ba"
+size = 256
+mtime_ms = 1791658863336
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/9386703f-a637-475f-b53c-9e05e45ab37d/b1faf767-34c4-4775-be01-456b161be650"
+storage_version_token = "1791658886569896"
+content_type = "text/plain"
+
+[[outputs]]
+id = "Yo2SNQXAykWM4pti-Si8T"
+uri = "file://attached_assets/extension-tests/DEMO_extension_test.tsv"
+type = "unspecified"
+title = "ملف تجربة — tsv"
+description = "بيانات مفصولة بعلامات تبويب؛ يفترض رفض امتداد TSV."
+logical_id = "2815d2cf-2263-42cc-93b1-5cb3581d29b4"
+content_hash = "sha256:329ec6c25f99763bd7d739414afeab734962c5d19aea04898865978408a989f1"
+size = 256
+mtime_ms = 1791658876080
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/2815d2cf-2263-42cc-93b1-5cb3581d29b4/39143ca6-8960-4af6-8d38-dd8af40c0e11"
+storage_version_token = "1791658887052613"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "6lH-10AwpFibJfTg7v58l"
+uri = "file://attached_assets/extension-tests/DEMO_extension_test.json"
+type = "unspecified"
+title = "ملف تجربة — json"
+description = "بيانات بصيغة JSON صحيحة؛ يفترض رفضها في مستورد CSV الحالي."
+logical_id = "0385d3b1-41bb-481e-89da-843c47d1e2c4"
+content_hash = "sha256:d5379d8fec790c52bc2d9e6edb3298a85fd7d78fad079e0d27a123bedb90faec"
+size = 684
+mtime_ms = 1791658867276
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/0385d3b1-41bb-481e-89da-843c47d1e2c4/b8c62e17-2b13-48f7-b0bf-b105f79bac2f"
+storage_version_token = "1791658887531533"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "XaZMVROuFoX2177rKnVP9"
+uri = "file://attached_assets/extension-tests/DEMO_extension_test.xml"
+type = "unspecified"
+title = "ملف تجربة — xml"
+description = "بيانات بصيغة XML صحيحة؛ يفترض رفضها في مستورد CSV الحالي."
+logical_id = "c2f67b34-0e1d-47d0-8e43-83448d32330b"
+content_hash = "sha256:647e9daaba365586d689f26b4109d7cc4c676fd1dad27cd933b1d19fe29b5d9d"
+size = 947
+mtime_ms = 1791658871028
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:50224286-3050-45b5-87a2-ff9231948715/c2f67b34-0e1d-47d0-8e43-83448d32330b/8c55ac98-89b3-48de-a64c-392dcf7be8ee"
+storage_version_token = "1791658888027171"
+content_type = "application/octet-stream"

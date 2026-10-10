@@ -1,0 +1,5 @@
+[
+  {"run_id":"E-01","event_id":"DEMO-EXT-01","record_type":"production","input_kg":1000,"good_output_kg":950,"scrap_kg":50,"mold_change_hours":4,"downtime_minutes":null,"order_id":null,"machine":null,"mold":null,"shift":null},
+  {"run_id":"E-02","event_id":"DEMO-EXT-02","record_type":"production","input_kg":1000,"good_output_kg":900,"scrap_kg":100,"mold_change_hours":6,"downtime_minutes":null,"order_id":null,"machine":null,"mold":null,"shift":null},
+  {"run_id":"E-02","event_id":"DEMO-EXT-03","record_type":"downtime","input_kg":null,"good_output_kg":null,"scrap_kg":null,"mold_change_hours":null,"downtime_minutes":45,"order_id":null,"machine":null,"mold":null,"shift":null}
+]

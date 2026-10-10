@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bar, BarChart, CartesianGrid, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Line, LineChart, CartesianGrid, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { diffMetric, fmtNum, LINES, UNIT_LABEL, type LineId, type LineMetrics } from '@/lib/data';
 import { MetricButton } from '@/components/bits';
 import { cn } from '@/lib/utils';
@@ -17,18 +17,10 @@ const OPTIONS: { key: ChartKey; label: string }[] = [
 
 const COLOR: Record<LineId, string> = { 'E-01': 'hsl(var(--e1))', 'E-02': 'hsl(var(--e2))' };
 
-function ArrowBar(props: unknown) {
-  const p = props as { x?: number; y?: number; width?: number; height?: number; fill?: string; payload?: { value: number | null } };
-  if (p.payload?.value == null || p.payload.value === 0) return <g />;
-  const { x = 0, y = 0, width = 0, height = 0 } = p;
-  const left = Math.min(x, x + width);
-  const right = Math.max(x, x + width);
-  const head = Math.min(14, (right - left) / 2);
-  const middle = y + height / 2;
-  const points = p.payload.value < 0
-    ? `${left},${middle} ${left + head},${y} ${right},${y} ${right},${y + height} ${left + head},${y + height}`
-    : `${left},${y} ${right - head},${y} ${right},${middle} ${right - head},${y + height} ${left},${y + height}`;
-  return <polygon points={points} fill={p.fill} />;
+function RunDot(props: unknown) {
+  const p = props as { cx?: number; cy?: number; payload?: { value: number | null; line: LineId } };
+  if (p.payload?.value == null || p.cx === undefined || p.cy === undefined) return <g />;
+  return <circle cx={p.cx} cy={p.cy} r={5} fill={COLOR[p.payload.line]} stroke="hsl(var(--card))" strokeWidth={2} />;
 }
 
 export function CompareChart({ lm }: { lm: Record<LineId, LineMetrics> }) {
@@ -77,36 +69,39 @@ export function CompareChart({ lm }: { lm: Record<LineId, LineMetrics> }) {
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart layout="vertical" data={data} margin={{ top: 12, right: 24, left: 0, bottom: 18 }} barCategoryGap="30%">
-                <CartesianGrid horizontal={false} stroke="hsl(var(--border))" strokeDasharray="3 3" />
-                <YAxis type="category" dataKey="line" width={48} tick={{ fontFamily: 'var(--app-font-mono)', fontSize: 12, fill: 'hsl(var(--foreground))' }} axisLine={false} tickLine={false} />
-                <XAxis
+              <LineChart data={data} margin={{ top: 24, right: 32, left: 8, bottom: 8 }}>
+                <CartesianGrid vertical={false} stroke="hsl(var(--border))" strokeDasharray="3 3" />
+                <XAxis type="category" dataKey="line" padding={{ left: 24, right: 24 }} tick={{ fontFamily: 'var(--app-font-mono)', fontSize: 12, fill: 'hsl(var(--foreground))' }} axisLine={false} tickLine={false} />
+                <YAxis
                   type="number"
+                  width={48}
                   domain={[min, allZero ? 1 : max * 1.15 || 1]}
                   allowDataOverflow={false}
                   tickFormatter={(v: number) => fmtNum(v)}
                   tick={{ fontFamily: 'var(--app-font-mono)', fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
                   axisLine={false}
                   tickLine={false}
-                  label={{ value: unitText, position: 'bottom', offset: 0, fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                  label={{ value: unitText, angle: -90, position: 'insideLeft', fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
                 />
                 <Tooltip
-                  cursor={{ fill: 'hsl(var(--muted) / .5)' }}
+                  cursor={{ stroke: 'hsl(var(--border))', strokeDasharray: '3 3' }}
                   formatter={(v: unknown) => [fmt(typeof v === 'number' ? v : null), opt.label]}
                   contentStyle={{ borderRadius: 4, border: '1px solid hsl(var(--border))', fontSize: 12, direction: 'rtl' }}
                 />
-                <Bar
+                <Line
                   key={key}
                   dataKey="value"
+                  type="linear"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={3}
+                  connectNulls={false}
+                  dot={RunDot}
+                  activeDot={{ r: 6 }}
                   isAnimationActive={false}
-                  shape={ArrowBar}
-                  maxBarSize={32}
-                  minPointSize={0}
                 >
-                  {LINES.map((line) => <Cell key={line} fill={lm[line][key].value === null ? 'transparent' : COLOR[line]} />)}
                   <LabelList dataKey="value" position="top" formatter={(v: unknown) => fmt(typeof v === 'number' ? v : null)} style={{ fontFamily: 'var(--app-font-mono)', fontSize: 11, fill: 'hsl(var(--foreground))' }} />
-                </Bar>
-              </BarChart>
+                </Line>
+              </LineChart>
             </ResponsiveContainer>
           )}
         </div>
@@ -125,6 +120,7 @@ export function CompareChart({ lm }: { lm: Record<LineId, LineMetrics> }) {
             <MetricButton m={diff} signed testId={`button-chart-diff-${key}`} />
           </div>
           {allZero && <p className="text-xs text-muted-foreground">القيم المعروفة تساوي صفرًا فعليًا؛ القيم المفقودة ليست صفرًا.</p>}
+          {known.length === 1 && <p className="text-xs text-muted-foreground">تظهر نقطة واحدة فقط؛ لا يُرسم خط مقارنة مع قيمة غير معروفة.</p>}
           {over100 && <p className="text-xs text-destructive">تنبيه: نسبة خارج 0–100٪ — بيانات غير متسقة، تُعرض كما هي دون قص.</p>}
           {key === 'downtime' && <p className="text-[11px] text-muted-foreground">التوقف منفصل عن تغيير القالب ولا يُجمع معه.</p>}
         </div>

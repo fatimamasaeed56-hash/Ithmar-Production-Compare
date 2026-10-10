@@ -2,7 +2,9 @@ import { Router, type Request, type Response } from 'express';
 import * as oidc from 'openid-client';
 import { db, usersTable } from '@workspace/db';
 import { GetCurrentAuthUserResponse } from '@workspace/api-zod';
-import { clearSession, createSession, getOidcConfig, getSessionId, SESSION_COOKIE, SESSION_TTL } from '../lib/auth';
+import { clearSession, createSession, getOidcConfig, getSession, getSessionId, updateSession, SESSION_COOKIE, SESSION_TTL } from '../lib/auth';
+import { profileName } from '../lib/profile-name';
+import { eq } from 'drizzle-orm';
 
 const router = Router();
 const cookieOptions = { httpOnly: true, secure: true, sameSite: 'lax' as const, path: '/' };
@@ -33,7 +35,28 @@ router.use((_req, res, next) => {
   next();
 });
 
-router.get('/auth/user', (req, res) => {
+router.get('/auth/user', async (req, res) => {
+  // Repair existing sessions as well as new logins without requiring a logout.
+  if (req.isAuthenticated() && !req.user.firstName?.trim() && !req.user.lastName?.trim()) {
+    const sid = getSessionId(req);
+    const session = sid ? await getSession(sid) : null;
+    if (sid && session && Date.now() - (session.profileCheckedAt ?? 0) > 5 * 60 * 1000) {
+      try {
+        const config = await getOidcConfig();
+        const info = await oidc.fetchUserInfo(config, session.access_token, req.user.id);
+        const names = profileName(info);
+        if (names.firstName || names.lastName) {
+          session.user = { ...session.user, ...names };
+          await db.update(usersTable).set({ ...names, updatedAt: new Date() }).where(eq(usersTable.id, req.user.id));
+          req.user = session.user;
+        }
+      } catch (error) {
+        req.log.warn({ errorName: error instanceof Error ? error.name : 'Error' }, 'Account profile lookup unavailable');
+      }
+      session.profileCheckedAt = Date.now();
+      await updateSession(sid, session);
+    }
+  }
   res.json(GetCurrentAuthUserResponse.parse({ user: req.isAuthenticated() ? req.user : null }));
 });
 
@@ -81,7 +104,7 @@ router.get('/callback', async (req, res) => {
     const nullableString = (value: unknown) => typeof value === 'string' ? value : null;
     const user = {
       id: claims.sub, email: nullableString(claims.email),
-      firstName: nullableString(claims.first_name), lastName: nullableString(claims.last_name),
+      ...profileName(claims),
       profileImageUrl: nullableString(claims.profile_image_url ?? claims.picture),
     };
     await db.insert(usersTable).values(user).onConflictDoUpdate({

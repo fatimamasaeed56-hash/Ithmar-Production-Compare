@@ -62,7 +62,7 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
     window.history.replaceState(window.history.state, '', url);
     setLanguage(next);
   };
-  const logoSrc = `${import.meta.env.BASE_URL}ithmar-logo.png`;
+  const logoSrc = `${import.meta.env.BASE_URL}ithmar-logo-updated.png`;
   return (
     <div dir={ar ? 'rtl' : 'ltr'} lang={language} className="relative min-h-[100dvh] overflow-x-hidden bg-background">
       <div aria-hidden className="paper-grid pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />

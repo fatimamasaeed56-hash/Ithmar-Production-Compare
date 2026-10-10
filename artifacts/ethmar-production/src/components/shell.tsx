@@ -24,7 +24,7 @@ export function Shell({ children, onLogout, userName }: { children: ReactNode; o
           <div className="flex items-center gap-3 max-sm:w-full">
             <Link href="/home" aria-label="إثمار للصناعات البلاستيكية — الصفحة الرئيسية" className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <img
-                src={`${import.meta.env.BASE_URL}ithmar-logo.png`}
+                src={`${import.meta.env.BASE_URL}ithmar-logo-updated.png`}
                 alt="Ithmar Plastic Industries — إثمار للصناعات البلاستيكية"
                 width={819}
                 height={331}

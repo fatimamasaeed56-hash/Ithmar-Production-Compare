@@ -17,6 +17,20 @@ const OPTIONS: { key: ChartKey; label: string }[] = [
 
 const COLOR: Record<LineId, string> = { 'E-01': 'hsl(var(--e1))', 'E-02': 'hsl(var(--e2))' };
 
+function ArrowBar(props: unknown) {
+  const p = props as { x?: number; y?: number; width?: number; height?: number; fill?: string; payload?: { value: number | null } };
+  if (p.payload?.value == null || p.payload.value === 0) return <g />;
+  const { x = 0, y = 0, width = 0, height = 0 } = p;
+  const left = Math.min(x, x + width);
+  const right = Math.max(x, x + width);
+  const head = Math.min(14, (right - left) / 2);
+  const middle = y + height / 2;
+  const points = p.payload.value < 0
+    ? `${left},${middle} ${left + head},${y} ${right},${y} ${right},${y + height} ${left + head},${y + height}`
+    : `${left},${y} ${right - head},${y} ${right},${middle} ${right - head},${y + height} ${left},${y + height}`;
+  return <polygon points={points} fill={p.fill} />;
+}
+
 export function CompareChart({ lm }: { lm: Record<LineId, LineMetrics> }) {
   const [key, setKey] = useState<ChartKey>('scrapRate');
   const opt = OPTIONS.find((o) => o.key === key)!;
@@ -63,18 +77,18 @@ export function CompareChart({ lm }: { lm: Record<LineId, LineMetrics> }) {
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data} margin={{ top: 22, right: 8, left: 0, bottom: 0 }} barCategoryGap="30%">
-                <CartesianGrid vertical={false} stroke="hsl(var(--border))" strokeDasharray="3 3" />
-                <XAxis dataKey="line" tick={{ fontFamily: 'var(--app-font-mono)', fontSize: 12, fill: 'hsl(var(--foreground))' }} axisLine={{ stroke: 'hsl(var(--border))' }} tickLine={false} />
-                <YAxis
+              <BarChart layout="vertical" data={data} margin={{ top: 12, right: 24, left: 0, bottom: 18 }} barCategoryGap="30%">
+                <CartesianGrid horizontal={false} stroke="hsl(var(--border))" strokeDasharray="3 3" />
+                <YAxis type="category" dataKey="line" width={48} tick={{ fontFamily: 'var(--app-font-mono)', fontSize: 12, fill: 'hsl(var(--foreground))' }} axisLine={false} tickLine={false} />
+                <XAxis
+                  type="number"
                   domain={[min, allZero ? 1 : max * 1.15 || 1]}
                   allowDataOverflow={false}
                   tickFormatter={(v: number) => fmtNum(v)}
                   tick={{ fontFamily: 'var(--app-font-mono)', fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
                   axisLine={false}
                   tickLine={false}
-                  width={44}
-                  label={{ value: unitText, angle: -90, position: 'insideLeft', fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                  label={{ value: unitText, position: 'bottom', offset: 0, fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
                 />
                 <Tooltip
                   cursor={{ fill: 'hsl(var(--muted) / .5)' }}
@@ -85,8 +99,8 @@ export function CompareChart({ lm }: { lm: Record<LineId, LineMetrics> }) {
                   key={key}
                   dataKey="value"
                   isAnimationActive={false}
-                  radius={[3, 3, 0, 0]}
-                  maxBarSize={72}
+                  shape={ArrowBar}
+                  maxBarSize={32}
                   minPointSize={0}
                 >
                   {LINES.map((line) => <Cell key={line} fill={lm[line][key].value === null ? 'transparent' : COLOR[line]} />)}

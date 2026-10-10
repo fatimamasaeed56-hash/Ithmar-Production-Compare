@@ -159,6 +159,7 @@ export const SendChatResponse = zod.object({
 })
 
 
+export const prepareArchiveUploadBodySha256RegExp = new RegExp('^[a-f0-9]{64}$');
 export const prepareArchiveUploadBodyNameMax = 255;
 
 export const prepareArchiveUploadBodySizeMax = 5242880;
@@ -166,6 +167,7 @@ export const prepareArchiveUploadBodySizeMax = 5242880;
 
 
 export const PrepareArchiveUploadBody = zod.object({
+  "sha256": zod.string().regex(prepareArchiveUploadBodySha256RegExp).optional(),
   "name": zod.string().min(1).max(prepareArchiveUploadBodyNameMax),
   "size": zod.number().int().min(1).max(prepareArchiveUploadBodySizeMax)
 })

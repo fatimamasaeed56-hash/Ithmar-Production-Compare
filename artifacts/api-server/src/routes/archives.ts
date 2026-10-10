@@ -10,6 +10,7 @@ import {
 } from '@workspace/api-zod';
 import { ObjectStorageService } from '../lib/objectStorage';
 import { archiveSnapshot, describeSelection, validateSelection } from '../lib/archive-validation';
+import { checkDailyDuplicates, DuplicateArchiveError, hashStoredFile, lockArchiveOwner } from '../lib/archive-deduplication';
 
 const router = Router();
 const storage = new ObjectStorageService();
@@ -33,6 +34,7 @@ async function serialize(row: ArchiveRow) {
   return { id: row.id, title: row.title, snapshot: row.snapshot, note: row.note, revision: row.revision, createdAt: row.createdAt, updatedAt: row.updatedAt, files };
 }
 function failed(req: Request, res: Response, error: unknown) {
+  if (error instanceof DuplicateArchiveError) { res.status(409).json({ error: error.message }); return; }
   req.log.error({ errorName: error instanceof Error ? error.name : 'Error' }, 'Archive operation failed');
   if (!res.headersSent) res.status(503).json({ error: 'تعذر حفظ أو تحميل السجل. لم تُؤكَّد العملية؛ أعد المحاولة.' });
 }
@@ -41,9 +43,13 @@ router.post('/archives/uploads', async (req, res) => {
   const body = PrepareArchiveUploadBody.safeParse(req.body);
   if (!body.success || !body.data.name.toLowerCase().endsWith('.csv')) { res.status(400).json({ error: 'اختر ملف CSV بحجم لا يتجاوز 5 ميجابايت.' }); return; }
   try {
+    if (body.data.sha256) await db.transaction(async (tx) => {
+      await lockArchiveOwner(tx, req.user!.id);
+      await checkDailyDuplicates(tx, req.user!.id, [body.data.sha256!], new Date());
+    });
     const uploadURL = await storage.getObjectEntityUploadURL();
     const id = randomUUID();
-    await db.insert(archiveUploadsTable).values({ id, ownerId: req.user!.id, ...body.data, objectPath: storage.normalizeObjectEntityPath(uploadURL) });
+    await db.insert(archiveUploadsTable).values({ id, ownerId: req.user!.id, name: body.data.name, size: body.data.size, objectPath: storage.normalizeObjectEntityPath(uploadURL) });
     res.json(PrepareArchiveUploadResponse.parse({ id, uploadURL }));
   } catch (error) { failed(req, res, error); }
 });
@@ -72,18 +78,29 @@ router.post('/archives', async (req, res) => {
     if (uploads.length !== data.uploadIds.length || uploads.some((f) => f.archiveId) || uploads.length !== parsed.data.files.length) {
       res.status(400).json({ error: 'الملفات غير متاحة لهذا الحساب.' }); return;
     }
+    const hashes = new Map<string, string>();
     for (const upload of uploads) {
       const file = await storage.getObjectEntityFile(upload.objectPath);
       const [meta] = await file.getMetadata();
       if (Number(meta.size) !== upload.size) { res.status(400).json({ error: 'لم يكتمل رفع الملف. أعد الاستيراد.' }); return; }
+      hashes.set(upload.id, await hashStoredFile(upload.objectPath, upload.size));
     }
     const snapshot = { ...parsed.data, id: data.id, title: data.title, records: parsed.data.records.map((r) => ({ ...r, datasetId: data.id })) };
     const created = await db.transaction(async (tx) => {
+      await lockArchiveOwner(tx, ownerId);
+      const [retry] = await tx.select().from(archivesTable).where(eq(archivesTable.id, data.id));
+      if (retry) {
+        if (retry.ownerId !== ownerId) throw new Error('Archive unavailable');
+        return retry;
+      }
+      const now = new Date();
+      await checkDailyDuplicates(tx, ownerId, [...hashes.values()], now);
       const locked = await tx.select().from(archiveUploadsTable).where(and(eq(archiveUploadsTable.ownerId, ownerId), inArray(archiveUploadsTable.id, data.uploadIds))).for('update');
       if (locked.some((f) => f.archiveId)) throw new Error('Upload already used');
-      const [row] = await tx.insert(archivesTable).values({ id: data.id, ownerId, title: data.title, snapshot }).returning();
+      const [row] = await tx.insert(archivesTable).values({ id: data.id, ownerId, title: data.title, snapshot, createdAt: now }).returning();
       await tx.update(archiveUploadsTable).set({ archiveId: row.id }).where(and(eq(archiveUploadsTable.ownerId, ownerId), inArray(archiveUploadsTable.id, data.uploadIds)));
-      await tx.insert(activitiesTable).values({ id: randomUUID(), ownerId, archiveId: row.id, title: row.title, kind: 'import', after: uploads.map((f) => f.name).join('\n') });
+      for (const [id, hash] of hashes) await tx.update(archiveUploadsTable).set({ contentHash: hash }).where(eq(archiveUploadsTable.id, id));
+      await tx.insert(activitiesTable).values({ id: randomUUID(), ownerId, archiveId: row.id, title: row.title, kind: 'import', after: uploads.map((f) => f.name).join('\n'), createdAt: now });
       return row;
     });
     res.status(201).json(CreateArchiveResponse.parse(await serialize(created)));

@@ -2,3 +2,4 @@
 - [Gemini availability](gemini-availability.md) — Model listing alone does not prove generation availability; validate with a real request.
 - [Preview cookie policy](preview-cookie-policy.md) — Preview may rewrite SameSite=Lax to None; inspect redacted direct/proxied attributes and retain CSRF defenses.
 - [Missing chart values](chart-null-values.md) — Recharts transitions can retain a previous bar for null; verify metric switching, not just initial rendering.
+- [Daily import rule](daily-import-rule.md) — Same CSV content once per account per Palestine day; different files allowed, old history preserved.

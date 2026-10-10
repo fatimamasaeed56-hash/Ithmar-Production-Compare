@@ -78,6 +78,8 @@ export interface ChatReply {
 }
 
 export interface ArchiveUploadInput {
+  /** @pattern ^[a-f0-9]{64}$ */
+  sha256?: string;
   /**
      * @minLength 1
      * @maxLength 255

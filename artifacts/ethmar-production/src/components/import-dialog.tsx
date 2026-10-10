@@ -233,7 +233,10 @@ export function ImportDialog() {
     setImportOpen(false);
     navigate('/sources');
     } catch (error) {
-      setSaveError(error instanceof Error && !('status' in error) ? error.message : 'تعذر حفظ الاستيراد في حسابك. لم تُفقد الملفات المختارة؛ أعد المحاولة.');
+      const duplicate = typeof error === 'object' && error !== null && 'status' in error && error.status === 409;
+      setSaveError(duplicate
+        ? 'نفس محتوى أحد الملفات محفوظ في حسابك اليوم بالفعل، حتى لو اختلف اسمه. لم تُنشأ نسخة جديدة. افتح النسخة من سجل النشاطات، أو أزل الملف المكرر وأعد استيراد الملفات الأخرى. يُحسب اليوم بتوقيت فلسطين.'
+        : error instanceof Error && !('status' in error) ? error.message : 'تعذر حفظ الاستيراد في حسابك. لم تُفقد الملفات المختارة؛ أعد المحاولة.');
     } finally { setSaving(false); }
   };
 
@@ -357,6 +360,7 @@ export function ImportDialog() {
           <DialogDescription className="flex items-start gap-1.5 text-xs">
             <Lock className="mt-0.5 size-3.5 shrink-0" aria-hidden />
             يُحلَّل CSV داخل المتصفح، ثم يُرفع الملف الأصلي وتُحفظ البيانات والملاحظات في حسابك فقط. يمكنك الرجوع إليها من سجل النشاطات. لا تعديل ولا اتصال بنظام ERP. الحد 5 ميجابايت للملف و10 ميجابايت للاستيراد.
+            {' '}يُحفظ نفس محتوى الملف مرة واحدة يوميًا لكل حساب بتوقيت فلسطين، مع السماح بملفات مختلفة.
           </DialogDescription>
         </DialogHeader>
 

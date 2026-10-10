@@ -121,8 +121,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       throw new Error('الحد 10 ملفات، 5 ميجابايت للملف و10 ميجابايت للاستيراد الواحد.');
     }
     if (new TextEncoder().encode(JSON.stringify(ds)).length > 18 * 1024 * 1024) throw new Error('بيانات الملف كبيرة جدًا؛ قسّم التصدير إلى ملفات أصغر.');
-    for (const file of files) {
-      const reservation = await prepareArchiveUpload({ name: file.name, size: file.size });
+    const fingerprints = await Promise.all(files.map(async (file) => {
+      const hash = await crypto.subtle.digest('SHA-256', await file.arrayBuffer());
+      return Array.from(new Uint8Array(hash), (b) => b.toString(16).padStart(2, '0')).join('');
+    }));
+    if (new Set(fingerprints).size !== fingerprints.length) {
+      throw new Error('اخترت نفس محتوى الملف أكثر من مرة في هذه العملية. أزل النسخة المكررة؛ لم تُحفظ أي ملفات من هذه العملية بعد.');
+    }
+    for (const [index, file] of files.entries()) {
+      const reservation = await prepareArchiveUpload({ name: file.name, size: file.size, sha256: fingerprints[index] });
       const response = await fetch(reservation.uploadURL, { method: 'PUT', body: file, headers: { 'Content-Type': 'text/csv' }, credentials: 'omit' });
       if (!response.ok) throw new Error('تعذر رفع الملف إلى حسابك. أعد المحاولة.');
       uploadIds.push(reservation.id);

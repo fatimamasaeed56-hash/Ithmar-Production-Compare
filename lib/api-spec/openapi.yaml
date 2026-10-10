@@ -114,6 +114,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ArchiveUpload"
+        "409":
+          description: Identical content already saved by this account today in Asia/Hebron
         "401":
           description: Sign in required
   /archives:
@@ -145,6 +147,8 @@ paths:
                 $ref: "#/components/schemas/Archive"
         "400":
           description: Invalid import
+        "409":
+          description: Duplicate content in this batch or already saved today in Asia/Hebron
         "401":
           description: Sign in required
   /archives/{id}:
@@ -302,6 +306,7 @@ components:
       type: object
       required: [name, size]
       properties:
+        sha256: { type: string, pattern: "^[a-f0-9]{64}$" }
         name: { type: string, minLength: 1, maxLength: 255 }
         size: { type: integer, minimum: 1, maximum: 5242880 }
     ArchiveUpload:

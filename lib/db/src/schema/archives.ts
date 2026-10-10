@@ -8,6 +8,7 @@ export const archiveUploadsTable = pgTable('archive_uploads', {
   name: text('name').notNull(),
   size: integer('size').notNull(),
   objectPath: text('object_path').notNull(),
+  contentHash: text('content_hash'),
   archiveId: text('archive_id'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [index('archive_uploads_owner_idx').on(t.ownerId)]);

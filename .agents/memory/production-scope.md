@@ -5,6 +5,12 @@ description: User-defined evidence and read-only constraints for production comp
 
 ERP means the factory's existing business-management system. CSV is a spreadsheet-like export. This prototype is a read-only view of factory-approved exports and cannot change the original system.
 
+The user explicitly chose independent email/password registration using Gmail or iCloud addresses, not Replit login, and repeated that redirecting to Replit is unwanted. Preserve this choice; do not substitute Replit authentication. Verification and password recovery require real email delivery. Existing private archives must not be automatically reassigned by matching email addresses.
+
+**Why:** The user selected “بريد وكلمة مرور” and reiterated “بدي ادخل من حساب ثاني” after objecting to the Replit redirect.
+
+**How to apply:** Implement independent verified email/password accounts; protect existing ownership and provide a separately authenticated account-linking path rather than weakening sign-in checks.
+
 **Why:** The user explicitly defined the system terminology and wants missing or duplicate source data shown as “مشكلات في البيانات” with a visible error message.
 
 **How to apply:** Explain these terms in the internal tool, not the previously simplified welcome page. Retain problematic rows for tracing; never claim the app independently certifies an imported file. Only report an absent expected run where its expected identity is actually known.

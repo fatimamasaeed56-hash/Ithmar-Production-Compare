@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { computeLine, diffMetric, LINES, METRIC_ROWS, type LineId, type LineMetrics } from '@/lib/data';
 import { useStore } from '@/lib/store';
 import { MetricButton } from '@/components/bits';
+import { CompareChart } from '@/components/compare-chart';
 import { DataIssues } from '@/components/data-issues';
 import { cn } from '@/lib/utils';
 
@@ -106,6 +107,8 @@ export default function ComparePage() {
           <LinePanel key={l} line={l} m={lm[l]} delay={80 + i * 80} />
         ))}
       </div>
+
+      <CompareChart lm={lm} />
 
       <div className="flex justify-end">
         <Button variant="default" onClick={() => setImportOpen(true)} data-testid="button-open-import">

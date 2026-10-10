@@ -11,6 +11,57 @@ tags:
   - name: health
     description: Health operations
 paths:
+  /auth/register:
+    post:
+      operationId: registerAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RegistrationInput" }
+      responses:
+        "201":
+          description: Account created and signed in
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthUserEnvelope" }
+  /auth/login:
+    post:
+      operationId: loginAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PasswordLoginInput" }
+      responses:
+        "200":
+          description: Signed in
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthUserEnvelope" }
+  /auth/logout:
+    post:
+      operationId: logoutAccount
+      responses:
+        "200":
+          description: Session invalidated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthUserEnvelope" }
+  /auth/password:
+    post:
+      operationId: activatePassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RegistrationInput" }
+      responses:
+        "200":
+          description: Existing authenticated account activated without moving its files
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthUserEnvelope" }
   /auth/profile:
     post:
       operationId: confirmProfile
@@ -208,6 +259,20 @@ paths:
                 $ref: "#/components/schemas/HealthStatus"
 components:
   schemas:
+    PasswordLoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email, maxLength: 254 }
+        password: { type: string, minLength: 1, maxLength: 128 }
+    RegistrationInput:
+      type: object
+      required: [email, name, password, jobDescription]
+      properties:
+        email: { type: string, format: email, maxLength: 254 }
+        name: { type: string, minLength: 1, maxLength: 160 }
+        password: { type: string, minLength: 9, maxLength: 128 }
+        jobDescription: { type: string, minLength: 1, maxLength: 500 }
     ProfileNames:
       type: object
       required: [firstName, lastName]
@@ -329,6 +394,9 @@ components:
       type: object
       required: [id, email, firstName, lastName, profileImageUrl]
       properties:
+        name: { type: [string, "null"] }
+        jobDescription: { type: [string, "null"] }
+        passwordEnabled: { type: boolean }
         profileConfirmed:
           type: boolean
         id:

@@ -7,6 +7,11 @@
  */
 
 export interface AuthUser {
+  /** @nullable */
+  name?: string | null;
+  /** @nullable */
+  jobDescription?: string | null;
+  passwordEnabled?: boolean;
   profileConfirmed?: boolean;
   id: string;
   /** @nullable */

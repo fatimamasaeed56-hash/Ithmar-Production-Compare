@@ -8,6 +8,113 @@
 import * as zod from 'zod';
 
 
+export const registerAccountBodyEmailMax = 254;
+
+export const registerAccountBodyNameMax = 160;
+
+export const registerAccountBodyPasswordMin = 9;
+export const registerAccountBodyPasswordMax = 128;
+
+export const registerAccountBodyJobDescriptionMax = 500;
+
+
+
+export const RegisterAccountBody = zod.object({
+  "email": zod.string().email().max(registerAccountBodyEmailMax),
+  "name": zod.string().min(1).max(registerAccountBodyNameMax),
+  "password": zod.string().min(registerAccountBodyPasswordMin).max(registerAccountBodyPasswordMax),
+  "jobDescription": zod.string().min(1).max(registerAccountBodyJobDescriptionMax)
+})
+
+export const RegisterAccountResponse = zod.object({
+  "user": zod.union([zod.object({
+  "name": zod.string().nullish(),
+  "jobDescription": zod.string().nullish(),
+  "passwordEnabled": zod.boolean().optional(),
+  "profileConfirmed": zod.boolean().optional(),
+  "id": zod.string(),
+  "email": zod.string().nullable(),
+  "firstName": zod.string().nullable(),
+  "lastName": zod.string().nullable(),
+  "profileImageUrl": zod.string().nullable()
+}),zod.null()])
+})
+
+
+export const loginAccountBodyEmailMax = 254;
+
+export const loginAccountBodyPasswordMax = 128;
+
+
+
+export const LoginAccountBody = zod.object({
+  "email": zod.string().email().max(loginAccountBodyEmailMax),
+  "password": zod.string().min(1).max(loginAccountBodyPasswordMax)
+})
+
+export const LoginAccountResponse = zod.object({
+  "user": zod.union([zod.object({
+  "name": zod.string().nullish(),
+  "jobDescription": zod.string().nullish(),
+  "passwordEnabled": zod.boolean().optional(),
+  "profileConfirmed": zod.boolean().optional(),
+  "id": zod.string(),
+  "email": zod.string().nullable(),
+  "firstName": zod.string().nullable(),
+  "lastName": zod.string().nullable(),
+  "profileImageUrl": zod.string().nullable()
+}),zod.null()])
+})
+
+
+export const LogoutAccountResponse = zod.object({
+  "user": zod.union([zod.object({
+  "name": zod.string().nullish(),
+  "jobDescription": zod.string().nullish(),
+  "passwordEnabled": zod.boolean().optional(),
+  "profileConfirmed": zod.boolean().optional(),
+  "id": zod.string(),
+  "email": zod.string().nullable(),
+  "firstName": zod.string().nullable(),
+  "lastName": zod.string().nullable(),
+  "profileImageUrl": zod.string().nullable()
+}),zod.null()])
+})
+
+
+export const activatePasswordBodyEmailMax = 254;
+
+export const activatePasswordBodyNameMax = 160;
+
+export const activatePasswordBodyPasswordMin = 9;
+export const activatePasswordBodyPasswordMax = 128;
+
+export const activatePasswordBodyJobDescriptionMax = 500;
+
+
+
+export const ActivatePasswordBody = zod.object({
+  "email": zod.string().email().max(activatePasswordBodyEmailMax),
+  "name": zod.string().min(1).max(activatePasswordBodyNameMax),
+  "password": zod.string().min(activatePasswordBodyPasswordMin).max(activatePasswordBodyPasswordMax),
+  "jobDescription": zod.string().min(1).max(activatePasswordBodyJobDescriptionMax)
+})
+
+export const ActivatePasswordResponse = zod.object({
+  "user": zod.union([zod.object({
+  "name": zod.string().nullish(),
+  "jobDescription": zod.string().nullish(),
+  "passwordEnabled": zod.boolean().optional(),
+  "profileConfirmed": zod.boolean().optional(),
+  "id": zod.string(),
+  "email": zod.string().nullable(),
+  "firstName": zod.string().nullable(),
+  "lastName": zod.string().nullable(),
+  "profileImageUrl": zod.string().nullable()
+}),zod.null()])
+})
+
+
 export const confirmProfileBodyFirstNameMax = 80;
 
 export const confirmProfileBodyLastNameMax = 80;
@@ -21,6 +128,9 @@ export const ConfirmProfileBody = zod.object({
 
 export const ConfirmProfileResponse = zod.object({
   "user": zod.union([zod.object({
+  "name": zod.string().nullish(),
+  "jobDescription": zod.string().nullish(),
+  "passwordEnabled": zod.boolean().optional(),
   "profileConfirmed": zod.boolean().optional(),
   "id": zod.string(),
   "email": zod.string().nullable(),
@@ -187,6 +297,9 @@ export const ListActivitiesResponse = zod.object({
 
 export const GetCurrentAuthUserResponse = zod.object({
   "user": zod.union([zod.object({
+  "name": zod.string().nullish(),
+  "jobDescription": zod.string().nullish(),
+  "passwordEnabled": zod.boolean().optional(),
   "profileConfirmed": zod.boolean().optional(),
   "id": zod.string(),
   "email": zod.string().nullable(),

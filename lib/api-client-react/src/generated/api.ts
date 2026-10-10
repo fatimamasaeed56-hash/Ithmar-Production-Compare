@@ -31,7 +31,9 @@ import type {
   ChatReply,
   HealthStatus,
   ListActivitiesParams,
-  ProfileNames
+  PasswordLoginInput,
+  ProfileNames,
+  RegistrationInput
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -60,6 +62,320 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getRegisterAccountUrl = () => {
+
+
+
+
+  return `/api/auth/register`
+}
+
+export const registerAccount = async (registrationInput: RegistrationInput, options?: Parameters<typeof customFetch>[1]): Promise<AuthUserEnvelope> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AuthUserEnvelope>(getRegisterAccountUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(registrationInput)
+  }
+);}
+
+
+
+
+
+export const getRegisterAccountMutationKey = () => ['registerAccount'] as const;
+
+export const getRegisterAccountMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerAccount>>, TError,RegisterAccountMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof registerAccount>>, TError,RegisterAccountMutationVariables, TContext> => {
+
+const mutationKey = getRegisterAccountMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerAccount>>, RegisterAccountMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  registerAccount(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RegisterAccountMutationResult = NonNullable<Awaited<ReturnType<typeof registerAccount>>>
+    export type RegisterAccountMutationBody = BodyType<RegistrationInput>
+    export type RegisterAccountMutationError = ErrorType<unknown>
+    export type RegisterAccountMutationVariables = {data: BodyType<RegistrationInput>}
+
+    export const useRegisterAccount = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerAccount>>, TError,RegisterAccountMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof registerAccount>>,
+        TError,
+        RegisterAccountMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRegisterAccountMutationOptions(options));
+    }
+
+export const getLoginAccountUrl = () => {
+
+
+
+
+  return `/api/auth/login`
+}
+
+export const loginAccount = async (passwordLoginInput: PasswordLoginInput, options?: Parameters<typeof customFetch>[1]): Promise<AuthUserEnvelope> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AuthUserEnvelope>(getLoginAccountUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(passwordLoginInput)
+  }
+);}
+
+
+
+
+
+export const getLoginAccountMutationKey = () => ['loginAccount'] as const;
+
+export const getLoginAccountMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginAccount>>, TError,LoginAccountMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof loginAccount>>, TError,LoginAccountMutationVariables, TContext> => {
+
+const mutationKey = getLoginAccountMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginAccount>>, LoginAccountMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  loginAccount(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LoginAccountMutationResult = NonNullable<Awaited<ReturnType<typeof loginAccount>>>
+    export type LoginAccountMutationBody = BodyType<PasswordLoginInput>
+    export type LoginAccountMutationError = ErrorType<unknown>
+    export type LoginAccountMutationVariables = {data: BodyType<PasswordLoginInput>}
+
+    export const useLoginAccount = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginAccount>>, TError,LoginAccountMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof loginAccount>>,
+        TError,
+        LoginAccountMutationVariables,
+        TContext
+      > => {
+      return useMutation(getLoginAccountMutationOptions(options));
+    }
+
+export const getLogoutAccountUrl = () => {
+
+
+
+
+  return `/api/auth/logout`
+}
+
+export const logoutAccount = async ( options?: Parameters<typeof customFetch>[1]): Promise<AuthUserEnvelope> => {
+
+  return customFetch<AuthUserEnvelope>(getLogoutAccountUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getLogoutAccountMutationKey = () => ['logoutAccount'] as const;
+
+export const getLogoutAccountMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutAccount>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof logoutAccount>>, TError,void, TContext> => {
+
+const mutationKey = getLogoutAccountMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof logoutAccount>>, void> = () => {
+
+
+          return  logoutAccount(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LogoutAccountMutationResult = NonNullable<Awaited<ReturnType<typeof logoutAccount>>>
+
+    export type LogoutAccountMutationError = ErrorType<unknown>
+
+
+    export const useLogoutAccount = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutAccount>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof logoutAccount>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getLogoutAccountMutationOptions(options));
+    }
+
+export const getActivatePasswordUrl = () => {
+
+
+
+
+  return `/api/auth/password`
+}
+
+export const activatePassword = async (registrationInput: RegistrationInput, options?: Parameters<typeof customFetch>[1]): Promise<AuthUserEnvelope> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AuthUserEnvelope>(getActivatePasswordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(registrationInput)
+  }
+);}
+
+
+
+
+
+export const getActivatePasswordMutationKey = () => ['activatePassword'] as const;
+
+export const getActivatePasswordMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activatePassword>>, TError,ActivatePasswordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof activatePassword>>, TError,ActivatePasswordMutationVariables, TContext> => {
+
+const mutationKey = getActivatePasswordMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof activatePassword>>, ActivatePasswordMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  activatePassword(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ActivatePasswordMutationResult = NonNullable<Awaited<ReturnType<typeof activatePassword>>>
+    export type ActivatePasswordMutationBody = BodyType<RegistrationInput>
+    export type ActivatePasswordMutationError = ErrorType<unknown>
+    export type ActivatePasswordMutationVariables = {data: BodyType<RegistrationInput>}
+
+    export const useActivatePassword = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activatePassword>>, TError,ActivatePasswordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof activatePassword>>,
+        TError,
+        ActivatePasswordMutationVariables,
+        TContext
+      > => {
+      return useMutation(getActivatePasswordMutationOptions(options));
+    }
 
 export const getConfirmProfileUrl = () => {
 

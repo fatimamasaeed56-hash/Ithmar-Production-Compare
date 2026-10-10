@@ -5,6 +5,36 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+export interface PasswordLoginInput {
+  /** @maxLength 254 */
+  email: string;
+  /**
+     * @minLength 1
+     * @maxLength 128
+     */
+  password: string;
+}
+
+export interface RegistrationInput {
+  /** @maxLength 254 */
+  email: string;
+  /**
+     * @minLength 1
+     * @maxLength 160
+     */
+  name: string;
+  /**
+     * @minLength 9
+     * @maxLength 128
+     */
+  password: string;
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  jobDescription: string;
+}
+
 export interface ProfileNames {
   /**
      * @minLength 1
@@ -146,6 +176,11 @@ export interface ActivityPage {
 }
 
 export interface AuthUser {
+  /** @nullable */
+  name?: string | null;
+  /** @nullable */
+  jobDescription?: string | null;
+  passwordEnabled?: boolean;
   profileConfirmed?: boolean;
   id: string;
   /** @nullable */

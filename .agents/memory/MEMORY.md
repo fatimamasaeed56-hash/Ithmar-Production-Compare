@@ -1,2 +1,3 @@
 - [Production evidence scope](production-scope.md) — Read-only ERP evidence; user authorized private per-account CSV/notes/history storage, superseding local-only rules.
 - [Gemini availability](gemini-availability.md) — Model listing alone does not prove generation availability; validate with a real request.
+- [Preview cookie policy](preview-cookie-policy.md) — Preview may rewrite SameSite=Lax to None; inspect redacted direct/proxied attributes and retain CSRF defenses.

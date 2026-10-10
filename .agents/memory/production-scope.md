@@ -24,11 +24,11 @@ The user explicitly authorized persistent per-account saving of imported CSV fil
 
 **Why:** The user explicitly confirmed upload/storage consent after being told it replaces the prior local-only behavior: “كل شخص يدخل للموقع ويعمل حساب يحفظ نشاطه وملفاته على حسابه”.
 
-Every authenticated sign-in must ask the user to enter or confirm their first and second names, including existing accounts. Refreshing the same confirmed session should not repeatedly interrupt them. Keep saved user-entered names rather than replacing them with identity-provider display names.
+Independent registration requires four fields in this exact order: email, a single name, password, job description. Subsequent login uses email/password only, superseding the previous first/second-name confirmation on every login. Passwords must have more than eight characters with letters, numbers, and symbols; store only a salted password hash, never plaintext.
 
-**Why:** The user requested name collection “حتى لو كان عنده حساب فعلي على الويبسايت” and access for other accounts without weakening real authentication or merging their data.
+**Why:** The user explicitly specified these four fields, database persistence, and removing Google sign-in after declining email-service setup.
 
-**How to apply:** Scope the confirmation to a login session; use identity-provider subject IDs, not entered names, for account ownership. Authorization flow cookies must be isolated per attempt so repeated clicks or tabs cannot overwrite each other's PKCE verifier.
+**How to apply:** Keep files bound to internal account IDs. Existing authenticated legacy sessions may activate a password without changing account IDs; never grant access to legacy files by simply registering the same email. Without a configured mail service, do not claim email verification or recovery works.
 
 **How to apply:** Show E-02 minus E-01 for the requested scrap-rate and mold-change summaries: +5 percentage points and +2 hours for the supplied records. Keep the 45-minute unplanned stop separate and make no causal inference.
 

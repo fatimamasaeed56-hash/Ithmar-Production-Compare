@@ -59,12 +59,22 @@ export function useAuth(): AuthState {
 
   const login = useCallback(() => {
     const base = getBasePath();
-    window.location.href = `/api/login?returnTo=${encodeURIComponent(`${base === '/' ? '' : base}/home`)}`;
+    window.location.href = `${base === '/' ? '' : base}/login`;
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     const base = getBasePath();
-    window.location.href = `/api/logout?returnTo=${encodeURIComponent(base)}`;
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }, body: '{}',
+      });
+      if (!response.ok) throw new Error('Logout failed');
+      setUser(null);
+      window.location.replace(base);
+    } catch {
+      window.alert('تعذر تسجيل الخروج. تحقق من الاتصال وأعد المحاولة؛ جلستك لم تُغلق بعد.');
+    }
   }, []);
 
   return {

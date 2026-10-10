@@ -1,4 +1,5 @@
-import { ArrowDown, ArrowLeft, Cpu, Factory, GraduationCap, LogIn, Package, RefreshCw, TriangleAlert } from 'lucide-react';
+import { ArrowDown, ArrowLeft, Cpu, Factory, GraduationCap, Info, Package, RefreshCw, TriangleAlert } from 'lucide-react';
+import { PasswordForm } from '@/components/password-form';
 import { Button } from '@/components/ui/button';
 import { useEffect, useRef, useState } from 'react';
 
@@ -123,7 +124,7 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
               <img src={logoSrc} alt={t('إثمار للصناعات البلاستيكية', 'Ithmar Plastic Industries')} width={819} height={331} className="h-auto w-48 max-w-full mix-blend-multiply" data-testid="login-logo" />
               <div>
                 <p className="font-semibold text-secondary-foreground">{t('أهلاً بعودتك', 'Welcome back')}</p>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">{t('ادخل عبر خدمة المصادقة للوصول إلى مقارنة سجلات الإنتاج.', 'Sign in through authentication to reach production comparison.')}</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">{t('ادخل ببريدك الإلكتروني وكلمة المرور للوصول إلى مقارنة سجلات الإنتاج.', 'Sign in with your email and password to reach production comparison.')}</p>
               </div>
             </div>
             <div className="flex flex-col justify-center p-6 sm:p-8">
@@ -157,9 +158,6 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
                   <Button size="lg" data-panel-primary onClick={onRetry} data-testid="button-retry">
                     <RefreshCw className="size-4" /> {t('إعادة المحاولة', 'Try again')}
                   </Button>
-                  <Button size="lg" variant="outline" onClick={onLogin} data-testid="button-login">
-                    <LogIn className="size-4" /> {t('تسجيل الدخول', 'Log in')}
-                  </Button>
                 </div>
               </div>
             ) : isAuthenticated ? (
@@ -170,15 +168,17 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
                 </Button>
               </div>
             ) : (
-              <div className="mt-4">
-                <p className="text-sm leading-7 text-muted-foreground">
+              <div className="mt-4" key={mode}>
+                <p className="mb-4 text-sm leading-7 text-muted-foreground">
                   {mode === 'signup'
-                    ? t('أنشئ حسابك عبر خدمة المصادقة الآمنة. يُنشأ ملفك في الموقع تلقائيًا بعد التحقق من هويتك لأول مرة، ثم تنتقل إلى الصفحة الرئيسية.', 'Create your account through secure authentication. Your site profile is created automatically after your first identity verification, then you continue to home.')
-                    : t('سجّل دخولك بأمان للوصول إلى الرئيسية وسجلات المصدر. ستنتقل إلى صفحة التحقق من هويتك.', 'Log in securely to access home and source records. You will be redirected to verify your identity.')}
+                    ? t('أنشئ حسابك بالبريد الإلكتروني وكلمة مرور قوية، ثم تنتقل إلى الصفحة الرئيسية.', 'Create your account with your email and a strong password, then continue to home.')
+                    : t('سجّل دخولك بالبريد الإلكتروني وكلمة المرور للوصول إلى الرئيسية وسجلات المصدر.', 'Log in with your email and password to access home and source records.')}
                 </p>
-                <Button size="lg" className="mt-6 w-full" data-panel-primary onClick={onLogin} data-testid={mode === 'signup' ? 'button-signup' : 'button-login'}>
-                  <LogIn className="size-4" /> {mode === 'signup' ? t('إنشاء حساب والمتابعة', 'Create account and continue') : t('تسجيل الدخول', 'Log in')}
-                </Button>
+                <div className="rise"><PasswordForm mode={mode} language={language} onSuccess={onLogin} /></div>
+                <p className="mt-4 flex gap-2 rounded-md bg-muted/60 p-3 text-xs leading-5 text-muted-foreground" data-testid="text-recovery-note">
+                  <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+                  {t('استعادة كلمة المرور عبر البريد الإلكتروني غير مفعّلة حاليًا. احفظ كلمة مرورك في مكان آمن.', 'Password recovery by email is not enabled yet. Keep your password somewhere safe.')}
+                </p>
               </div>
             )}
 

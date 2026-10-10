@@ -30,6 +30,12 @@ Independent registration requires four fields in this exact order: email, a sing
 
 **How to apply:** Keep files bound to internal account IDs. Existing authenticated legacy sessions may activate a password without changing account IDs; never grant access to legacy files by simply registering the same email. Without a configured mail service, do not claim email verification or recovery works.
 
+The user explicitly cancelled email verification and password recovery: “الغى خدمة التحقق من البريد واستعادة كلمة المرور”.
+
+**Why:** The user requested cancellation after declining mail-service setup.
+
+**How to apply:** Do not resume mail-service setup or add email verification/password recovery unless the user explicitly requests them again. Preserve existing email/password login.
+
 **How to apply:** Show E-02 minus E-01 for the requested scrap-rate and mold-change summaries: +5 percentage points and +2 hours for the supplied records. Keep the 45-minute unplanned stop separate and make no causal inference.
 
 The CSV intake must use PapaParse with header:true and skipEmptyLines:'greedy'. Entirely empty lines, including the trailing newline, are not incomplete data records. Missing values within data rows remain visible with warnings. Recognized run_id, event_id, record_type headers and an error-free parse trigger direct import; alternate headers trigger automatic navigation to column mapping. The same file can be chosen again.

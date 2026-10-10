@@ -1,4 +1,5 @@
-import { Eye, FileUp } from 'lucide-react';
+import { useState } from 'react';
+import { Eye, FileUp, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FIELD_META, FIELDS, LINES, type Dataset } from '@/lib/data';
 import { useStore } from '@/lib/store';
@@ -8,6 +9,7 @@ import { DataIssues } from '@/components/data-issues';
 import { Textarea } from '@/components/ui/textarea';
 
 function DatasetBlock({ ds }: { ds: Dataset }) {
+  const [closed, setClosed] = useState(false);
   const { active, setActiveId, openTrace, selectRecord, toggleDowntime, notes, setNote, saveStates, retrySave, restoreSaved, archives } = useStore();
   const isActive = active.id === ds.id;
   const status = (id: string) => {
@@ -27,7 +29,23 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
             <Eye className="size-3.5" /> عرض في المقارنة
           </Button>
         )}
+        {ds.origin === 'csv' && (
+          <Button size="sm" variant="outline" className="h-7"
+            disabled={!closed && (saveStates[ds.id]?.status === 'saving' || saveStates[ds.id]?.status === 'error')}
+            onClick={() => setClosed((value) => !value)}
+            aria-expanded={!closed} aria-controls={`source-content-${ds.id}`}
+            data-testid={`button-close-source-${ds.id}`}>
+            {closed ? <Eye className="size-3.5" /> : <X className="size-3.5" />}
+            {closed ? 'فتح الملف' : 'إغلاق الملف'}
+          </Button>
+        )}
       </div>
+      {closed ? (
+        <p className="px-4 py-3 text-xs text-muted-foreground" role="status">
+          تم إغلاق عرض الملف فقط. الملف وملاحظاته باقيان في حسابك، ويمكنك فتحه مجددًا.
+        </p>
+      ) : (
+      <div id={`source-content-${ds.id}`}>
       <DataIssues dataset={ds} />
       {ds.files.length > 0 && (
         <ul className="flex flex-wrap gap-x-4 gap-y-1 border-b bg-muted/30 px-4 py-2 text-[11px] text-muted-foreground">
@@ -157,6 +175,8 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
             {archives.find((a) => a.id === ds.id)?.files.map((file) => <a key={file.id} className="text-primary underline" href={`${import.meta.env.BASE_URL}api/archives/${encodeURIComponent(ds.id)}/files/${encodeURIComponent(file.id)}`}>تنزيل الملف الأصلي: {file.name}</a>)}
           </div>
         </div>
+      )}
+      </div>
       )}
     </section>
   );

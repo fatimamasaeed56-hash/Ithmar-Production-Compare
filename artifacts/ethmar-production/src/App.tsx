@@ -13,6 +13,7 @@ import { Route, Switch, Redirect, useLocation, Router as WouterRouter } from 'wo
 
 const ComparePage = lazy(() => import('@/pages/compare'));
 const SourcesPage = lazy(() => import('@/pages/sources'));
+const ActivityPage = lazy(() => import('@/pages/activity'));
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ function Router() {
           <Route path="/home" component={ComparePage} />
           <Route path="/compare" component={ComparePage} />
           <Route path="/sources" component={SourcesPage} />
+          <Route path="/activity">{auth.user && <ActivityPage userId={auth.user.id} />}</Route>
           <Route path="/account">{auth.user && <AccountPage user={auth.user} onLogout={auth.logout} />}</Route>
           <Route component={NotFound} />
         </Switch>

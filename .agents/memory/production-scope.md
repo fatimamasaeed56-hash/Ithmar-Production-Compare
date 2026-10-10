@@ -14,9 +14,9 @@ The user wants a read-only tool for the ETHMAR PLASTICS production manager to co
 
 **How to apply:** Do not invent production data or certify imported exports as approved. Distinguish values supplied in chat from actual imported file evidence; absence of a stoppage record is unknown, not zero.
 
-CSV processing must stay in browser memory only: no upload or persistent saving, ERP connection or writes, or AI API. The user later explicitly requested real login protecting comparison, superseding their earlier no-login requirement; account/session storage is separate from the prohibition on storing production CSV data. Use React, Vite, and TypeScript. Never silently remove incomplete or duplicate rows; warn and retain reviewability. Do not invent order, machine, mold, shift, or ERP identifiers; any demo identifiers must explicitly say DEMO.
+The user explicitly authorized persistent per-account saving of imported CSV files, notes, and activity on 2026-10-10, superseding the earlier browser-memory-only/no-upload rule. They said each person who creates an account must have their own files and activity. Parse CSV in the browser, but save originals privately in App Storage and records/notes/history in the account database. Never expose another user's records or download links without ownership checks. No ERP connection or writes, or AI API. Real login is required. Use React, Vite, and TypeScript. Never silently remove incomplete or duplicate rows; warn and retain reviewability. Do not invent order, machine, mold, shift, or ERP identifiers; any demo identifiers must explicitly say DEMO.
 
-**Why:** The user explicitly requires this scope for this version.
+**Why:** The user explicitly confirmed upload/storage consent after being told it replaces the prior local-only behavior: “كل شخص يدخل للموقع ويعمل حساب يحفظ نشاطه وملفاته على حسابه”.
 
 **How to apply:** Show E-02 minus E-01 for the requested scrap-rate and mold-change summaries: +5 percentage points and +2 hours for the supplied records. Keep the 45-minute unplanned stop separate and make no causal inference.
 

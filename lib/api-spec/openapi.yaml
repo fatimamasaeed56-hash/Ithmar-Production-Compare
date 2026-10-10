@@ -11,6 +11,120 @@ tags:
   - name: health
     description: Health operations
 paths:
+  /archives/uploads:
+    post:
+      operationId: prepareArchiveUpload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArchiveUploadInput"
+      responses:
+        "200":
+          description: Private upload reservation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArchiveUpload"
+        "401":
+          description: Sign in required
+  /archives:
+    get:
+      operationId: listArchives
+      responses:
+        "200":
+          description: Current user's saved imports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Archive"
+    post:
+      operationId: createArchive
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArchiveInput"
+      responses:
+        "201":
+          description: Saved import
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Archive"
+        "400":
+          description: Invalid import
+        "401":
+          description: Sign in required
+  /archives/{id}:
+    patch:
+      operationId: updateArchive
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArchiveUpdate"
+      responses:
+        "200":
+          description: Saved changes and recorded activity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Archive"
+        "404":
+          description: Not found for current user
+        "409":
+          description: A newer revision exists
+  /archives/{id}/files/{fileId}:
+    get:
+      operationId: downloadArchiveFile
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: path
+          name: fileId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Original private CSV file
+          content:
+            text/csv:
+              schema: { type: string, format: binary }
+        "404":
+          description: Not found for current user
+  /activities:
+    get:
+      operationId: listActivities
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string, maxLength: 200 }
+        - in: query
+          name: day
+          schema: { type: string }
+        - in: query
+          name: offset
+          schema: { type: integer, minimum: 0, default: 0 }
+      responses:
+        "200":
+          description: Current user's daily activity, newest first, Asia/Hebron timezone
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivityPage"
   /auth/user:
     get:
       operationId: getCurrentAuthUser
@@ -58,6 +172,98 @@ paths:
                 $ref: "#/components/schemas/HealthStatus"
 components:
   schemas:
+    ArchiveUploadInput:
+      type: object
+      required: [name, size]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 255 }
+        size: { type: integer, minimum: 1, maximum: 5242880 }
+    ArchiveUpload:
+      type: object
+      required: [id, uploadURL]
+      properties:
+        id: { type: string }
+        uploadURL: { type: string }
+    ArchiveFile:
+      type: object
+      required: [id, name, size]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        size: { type: integer }
+    ArchiveInput:
+      type: object
+      required: [id, title, uploadIds, snapshot]
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string, minLength: 1, maxLength: 2000 }
+        uploadIds:
+          type: array
+          minItems: 1
+          maxItems: 10
+          items: { type: string }
+        snapshot:
+          type: object
+          additionalProperties: true
+    Archive:
+      type: object
+      required: [id, title, snapshot, files, note, revision, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        snapshot:
+          type: object
+          additionalProperties: true
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/ArchiveFile"
+        note: { type: string }
+        revision: { type: integer }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    ArchiveUpdate:
+      type: object
+      required: [revision]
+      properties:
+        revision: { type: integer, minimum: 1 }
+        note: { type: string, maxLength: 20000 }
+        selection:
+          type: object
+          required: [E-01, E-02]
+          properties:
+            E-01: { type: string }
+            E-02: { type: string }
+        downtime:
+          type: object
+          required: [E-01, E-02]
+          properties:
+            E-01:
+              type: array
+              items: { type: string }
+            E-02:
+              type: array
+              items: { type: string }
+    Activity:
+      type: object
+      required: [id, archiveId, title, kind, before, after, createdAt]
+      properties:
+        id: { type: string }
+        archiveId: { type: string }
+        title: { type: string }
+        kind: { type: string, enum: [import, note, selection, downtime] }
+        before: { type: string }
+        after: { type: string }
+        createdAt: { type: string, format: date-time }
+    ActivityPage:
+      type: object
+      required: [items, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Activity"
+        hasMore: { type: boolean }
     AuthUser:
       type: object
       required: [id, email, firstName, lastName, profileImageUrl]

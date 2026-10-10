@@ -6,22 +6,33 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
+  ActivityPage,
+  Archive,
+  ArchiveInput,
+  ArchiveUpdate,
+  ArchiveUpload,
+  ArchiveUploadInput,
   AuthUserEnvelope,
-  HealthStatus
+  HealthStatus,
+  ListActivitiesParams
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
-import type { ErrorType } from '../custom-fetch';
+import type { ErrorType , BodyType } from '../custom-fetch';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -46,6 +57,478 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getPrepareArchiveUploadUrl = () => {
+
+
+
+
+  return `/api/archives/uploads`
+}
+
+export const prepareArchiveUpload = async (archiveUploadInput: ArchiveUploadInput, options?: Parameters<typeof customFetch>[1]): Promise<ArchiveUpload> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ArchiveUpload>(getPrepareArchiveUploadUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(archiveUploadInput)
+  }
+);}
+
+
+
+
+
+export const getPrepareArchiveUploadMutationKey = () => ['prepareArchiveUpload'] as const;
+
+export const getPrepareArchiveUploadMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof prepareArchiveUpload>>, TError,PrepareArchiveUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof prepareArchiveUpload>>, TError,PrepareArchiveUploadMutationVariables, TContext> => {
+
+const mutationKey = getPrepareArchiveUploadMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof prepareArchiveUpload>>, PrepareArchiveUploadMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  prepareArchiveUpload(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PrepareArchiveUploadMutationResult = NonNullable<Awaited<ReturnType<typeof prepareArchiveUpload>>>
+    export type PrepareArchiveUploadMutationBody = BodyType<ArchiveUploadInput>
+    export type PrepareArchiveUploadMutationError = ErrorType<void>
+    export type PrepareArchiveUploadMutationVariables = {data: BodyType<ArchiveUploadInput>}
+
+    export const usePrepareArchiveUpload = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof prepareArchiveUpload>>, TError,PrepareArchiveUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof prepareArchiveUpload>>,
+        TError,
+        PrepareArchiveUploadMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPrepareArchiveUploadMutationOptions(options));
+    }
+
+export const getListArchivesUrl = () => {
+
+
+
+
+  return `/api/archives`
+}
+
+export const listArchives = async ( options?: Parameters<typeof customFetch>[1]): Promise<Archive[]> => {
+
+  return customFetch<Archive[]>(getListArchivesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListArchivesQueryKey = () => {
+    return [
+    `/api/archives`
+    ] as const;
+    }
+
+
+export const getListArchivesQueryOptions = <TData = Awaited<ReturnType<typeof listArchives>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listArchives>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListArchivesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listArchives>>> = ({ signal }) => listArchives({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listArchives>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListArchivesQueryResult = NonNullable<Awaited<ReturnType<typeof listArchives>>>
+export type ListArchivesQueryError = ErrorType<unknown>
+
+
+
+export function useListArchives<TData = Awaited<ReturnType<typeof listArchives>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listArchives>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListArchivesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateArchiveUrl = () => {
+
+
+
+
+  return `/api/archives`
+}
+
+export const createArchive = async (archiveInput: ArchiveInput, options?: Parameters<typeof customFetch>[1]): Promise<Archive> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<Archive>(getCreateArchiveUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(archiveInput)
+  }
+);}
+
+
+
+
+
+export const getCreateArchiveMutationKey = () => ['createArchive'] as const;
+
+export const getCreateArchiveMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createArchive>>, TError,CreateArchiveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createArchive>>, TError,CreateArchiveMutationVariables, TContext> => {
+
+const mutationKey = getCreateArchiveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createArchive>>, CreateArchiveMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createArchive(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateArchiveMutationResult = NonNullable<Awaited<ReturnType<typeof createArchive>>>
+    export type CreateArchiveMutationBody = BodyType<ArchiveInput>
+    export type CreateArchiveMutationError = ErrorType<void>
+    export type CreateArchiveMutationVariables = {data: BodyType<ArchiveInput>}
+
+    export const useCreateArchive = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createArchive>>, TError,CreateArchiveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createArchive>>,
+        TError,
+        CreateArchiveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateArchiveMutationOptions(options));
+    }
+
+export const getUpdateArchiveUrl = (id: string,) => {
+
+
+
+
+  return `/api/archives/${id}`
+}
+
+export const updateArchive = async (id: string,
+    archiveUpdate: ArchiveUpdate, options?: Parameters<typeof customFetch>[1]): Promise<Archive> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<Archive>(getUpdateArchiveUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(archiveUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateArchiveMutationKey = () => ['updateArchive'] as const;
+
+export const getUpdateArchiveMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateArchive>>, TError,UpdateArchiveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateArchive>>, TError,UpdateArchiveMutationVariables, TContext> => {
+
+const mutationKey = getUpdateArchiveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateArchive>>, UpdateArchiveMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateArchive(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateArchiveMutationResult = NonNullable<Awaited<ReturnType<typeof updateArchive>>>
+    export type UpdateArchiveMutationBody = BodyType<ArchiveUpdate>
+    export type UpdateArchiveMutationError = ErrorType<void>
+    export type UpdateArchiveMutationVariables = {id: string;data: BodyType<ArchiveUpdate>}
+
+    export const useUpdateArchive = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateArchive>>, TError,UpdateArchiveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateArchive>>,
+        TError,
+        UpdateArchiveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateArchiveMutationOptions(options));
+    }
+
+export const getDownloadArchiveFileUrl = (id: string,
+    fileId: string,) => {
+
+
+
+
+  return `/api/archives/${id}/files/${fileId}`
+}
+
+export const downloadArchiveFile = async (id: string,
+    fileId: string, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getDownloadArchiveFileUrl(id,fileId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDownloadArchiveFileQueryKey = (id: string,
+    fileId: string,) => {
+    return [
+    `/api/archives/${id}/files/${fileId}`
+    ] as const;
+    }
+
+
+export const getDownloadArchiveFileQueryOptions = <TData = Awaited<ReturnType<typeof downloadArchiveFile>>, TError = ErrorType<void>>(id: string,
+    fileId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof downloadArchiveFile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDownloadArchiveFileQueryKey(id,fileId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadArchiveFile>>> = ({ signal }) => downloadArchiveFile(id,fileId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined && fileId !== null && fileId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadArchiveFile>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type DownloadArchiveFileQueryResult = NonNullable<Awaited<ReturnType<typeof downloadArchiveFile>>>
+export type DownloadArchiveFileQueryError = ErrorType<void>
+
+
+
+export function useDownloadArchiveFile<TData = Awaited<ReturnType<typeof downloadArchiveFile>>, TError = ErrorType<void>>(
+ id: string,
+    fileId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof downloadArchiveFile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getDownloadArchiveFileQueryOptions(id,fileId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListActivitiesUrl = (params?: ListActivitiesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/activities?${stringifiedParams}` : `/api/activities`
+}
+
+export const listActivities = async (params?: ListActivitiesParams, options?: Parameters<typeof customFetch>[1]): Promise<ActivityPage> => {
+
+  return customFetch<ActivityPage>(getListActivitiesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListActivitiesQueryKey = (params?: ListActivitiesParams,) => {
+    return [
+    `/api/activities`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof listActivities>>, TError = ErrorType<unknown>>(params?: ListActivitiesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listActivities>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListActivitiesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listActivities>>> = ({ signal }) => listActivities(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listActivities>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof listActivities>>>
+export type ListActivitiesQueryError = ErrorType<unknown>
+
+
+
+export function useListActivities<TData = Awaited<ReturnType<typeof listActivities>>, TError = ErrorType<unknown>>(
+ params?: ListActivitiesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listActivities>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListActivitiesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetCurrentAuthUserUrl = () => {
 

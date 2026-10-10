@@ -8,6 +8,142 @@
 import * as zod from 'zod';
 
 
+export const prepareArchiveUploadBodyNameMax = 255;
+
+export const prepareArchiveUploadBodySizeMax = 5242880;
+
+
+
+export const PrepareArchiveUploadBody = zod.object({
+  "name": zod.string().min(1).max(prepareArchiveUploadBodyNameMax),
+  "size": zod.number().int().min(1).max(prepareArchiveUploadBodySizeMax)
+})
+
+export const PrepareArchiveUploadResponse = zod.object({
+  "id": zod.string(),
+  "uploadURL": zod.string()
+})
+
+
+export const ListArchivesResponseItem = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "snapshot": zod.record(zod.string(), zod.unknown()),
+  "files": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "size": zod.number().int()
+})),
+  "note": zod.string(),
+  "revision": zod.number().int(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListArchivesResponse = zod.array(ListArchivesResponseItem)
+
+
+export const createArchiveBodyTitleMax = 2000;
+
+export const createArchiveBodyUploadIdsMax = 10;
+
+
+
+export const CreateArchiveBody = zod.object({
+  "id": zod.string().uuid(),
+  "title": zod.string().min(1).max(createArchiveBodyTitleMax),
+  "uploadIds": zod.array(zod.string()).min(1).max(createArchiveBodyUploadIdsMax),
+  "snapshot": zod.record(zod.string(), zod.unknown())
+})
+
+export const CreateArchiveResponse = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "snapshot": zod.record(zod.string(), zod.unknown()),
+  "files": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "size": zod.number().int()
+})),
+  "note": zod.string(),
+  "revision": zod.number().int(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const UpdateArchiveParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+
+export const updateArchiveBodyNoteMax = 20000;
+
+
+
+export const UpdateArchiveBody = zod.object({
+  "revision": zod.number().int().min(1),
+  "note": zod.string().max(updateArchiveBodyNoteMax).optional(),
+  "selection": zod.object({
+  "E-01": zod.string(),
+  "E-02": zod.string()
+}).optional(),
+  "downtime": zod.object({
+  "E-01": zod.array(zod.string()),
+  "E-02": zod.array(zod.string())
+}).optional()
+})
+
+export const UpdateArchiveResponse = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "snapshot": zod.record(zod.string(), zod.unknown()),
+  "files": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "size": zod.number().int()
+})),
+  "note": zod.string(),
+  "revision": zod.number().int(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const DownloadArchiveFileParams = zod.object({
+  "id": zod.coerce.string(),
+  "fileId": zod.coerce.string()
+})
+
+export const DownloadArchiveFileResponse = zod.unknown()
+
+
+export const listActivitiesQueryQMax = 200;
+
+export const listActivitiesQueryOffsetDefault = 0;
+export const listActivitiesQueryOffsetMin = 0;
+
+
+
+export const ListActivitiesQueryParams = zod.object({
+  "q": zod.coerce.string().max(listActivitiesQueryQMax).optional(),
+  "day": zod.coerce.string().optional(),
+  "offset": zod.coerce.number().int().min(listActivitiesQueryOffsetMin).default(listActivitiesQueryOffsetDefault)
+})
+
+export const ListActivitiesResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "archiveId": zod.string(),
+  "title": zod.string(),
+  "kind": zod.enum(['import', 'note', 'selection', 'downtime']),
+  "before": zod.string(),
+  "after": zod.string(),
+  "createdAt": zod.coerce.date()
+})),
+  "hasMore": zod.boolean()
+})
+
+
 export const GetCurrentAuthUserResponse = zod.object({
   "user": zod.union([zod.object({
   "id": zod.string(),

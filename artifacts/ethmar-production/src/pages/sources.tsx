@@ -8,7 +8,7 @@ import { DataIssues } from '@/components/data-issues';
 import { Textarea } from '@/components/ui/textarea';
 
 function DatasetBlock({ ds }: { ds: Dataset }) {
-  const { active, setActiveId, openTrace, selectRecord, toggleDowntime, notes, setNote } = useStore();
+  const { active, setActiveId, openTrace, selectRecord, toggleDowntime, notes, setNote, saveStates, retrySave, restoreSaved, archives } = useStore();
   const isActive = active.id === ds.id;
   const status = (id: string) => {
     if (Object.values(ds.selection).includes(id)) return { t: 'تشغيل مختار', c: 'bg-primary text-primary-foreground' };
@@ -134,6 +134,7 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
             data-testid={`notes-${ds.id}`}
             aria-describedby={`notes-help-${ds.id}`}
             rows={2}
+            maxLength={20000}
             dir="auto"
             value={notes[ds.id] ?? ''}
             onChange={(event) => setNote(ds.id, event.target.value)}
@@ -141,8 +142,20 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
             className="min-h-20 resize-y bg-background text-start"
           />
           <p id={`notes-help-${ds.id}`} className="mt-1.5 text-[11px] text-muted-foreground">
-            ملاحظات مؤقتة لهذا الجدول؛ لا تغيّر بيانات المصدر ولا تُرسل أو تُحفظ، وتزول عند تحديث الصفحة أو تسجيل الخروج.
+            تُحفظ تلقائيًا في حسابك، ويُسجَّل تاريخ تعديلها في سجل النشاطات. لا تغيّر بيانات المصدر.
           </p>
+          <div className="mt-2 text-xs" aria-live="polite">
+            {saveStates[ds.id]?.status === 'saving' ? 'جارٍ حفظ التغييرات…' : saveStates[ds.id]?.status === 'error' ? (
+              <div role="alert" className="space-y-2 text-destructive">
+                <p>{saveStates[ds.id].message}</p>
+                <Button variant="outline" size="sm" onClick={() => retrySave(ds.id)}>إعادة محاولة الحفظ</Button>
+                <Button variant="ghost" size="sm" onClick={() => void restoreSaved(ds.id)}>استعادة النسخة المحفوظة</Button>
+              </div>
+            ) : <span className="text-primary">محفوظ في حسابك</span>}
+          </div>
+          <div className="mt-3 flex flex-wrap gap-3 text-xs">
+            {archives.find((a) => a.id === ds.id)?.files.map((file) => <a key={file.id} className="text-primary underline" href={`${import.meta.env.BASE_URL}api/archives/${encodeURIComponent(ds.id)}/files/${encodeURIComponent(file.id)}`}>تنزيل الملف الأصلي: {file.name}</a>)}
+          </div>
         </div>
       )}
     </section>

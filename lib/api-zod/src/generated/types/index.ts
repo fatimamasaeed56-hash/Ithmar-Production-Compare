@@ -6,6 +6,20 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './activity';
+export * from './activityKind';
+export * from './activityPage';
+export * from './archive';
+export * from './archiveFile';
+export * from './archiveInput';
+export * from './archiveInputSnapshot';
+export * from './archiveSnapshot';
+export * from './archiveUpdate';
+export * from './archiveUpdateDowntime';
+export * from './archiveUpdateSelection';
+export * from './archiveUpload';
+export * from './archiveUploadInput';
 export * from './authUser';
 export * from './authUserEnvelope';
 export * from './healthStatus';
+export * from './listActivitiesParams';

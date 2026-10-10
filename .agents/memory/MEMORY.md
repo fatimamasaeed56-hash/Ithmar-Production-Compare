@@ -1,1 +1,1 @@
-- [Production evidence scope](production-scope.md) — Read-only ETHMAR comparison, user-supplied data only, source-row traceability and separate downtime.
+- [Production evidence scope](production-scope.md) — Read-only ERP evidence; user authorized private per-account CSV/notes/history storage, superseding local-only rules.

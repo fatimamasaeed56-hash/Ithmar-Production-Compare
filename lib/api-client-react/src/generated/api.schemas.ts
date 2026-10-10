@@ -5,6 +5,104 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+export interface ArchiveUploadInput {
+  /**
+     * @minLength 1
+     * @maxLength 255
+     */
+  name: string;
+  /**
+     * @minimum 1
+     * @maximum 5242880
+     */
+  size: number;
+}
+
+export interface ArchiveUpload {
+  id: string;
+  uploadURL: string;
+}
+
+export interface ArchiveFile {
+  id: string;
+  name: string;
+  size: number;
+}
+
+export type ArchiveInputSnapshot = { [key: string]: unknown };
+
+export interface ArchiveInput {
+  id: string;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  title: string;
+  /**
+     * @minItems 1
+     * @maxItems 10
+     */
+  uploadIds: string[];
+  snapshot: ArchiveInputSnapshot;
+}
+
+export type ArchiveSnapshot = { [key: string]: unknown };
+
+export interface Archive {
+  id: string;
+  title: string;
+  snapshot: ArchiveSnapshot;
+  files: ArchiveFile[];
+  note: string;
+  revision: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ArchiveUpdateSelection = {
+  'E-01': string;
+  'E-02': string;
+};
+
+export type ArchiveUpdateDowntime = {
+  'E-01': string[];
+  'E-02': string[];
+};
+
+export interface ArchiveUpdate {
+  /** @minimum 1 */
+  revision: number;
+  /** @maxLength 20000 */
+  note?: string;
+  selection?: ArchiveUpdateSelection;
+  downtime?: ArchiveUpdateDowntime;
+}
+
+export type ActivityKind = typeof ActivityKind[keyof typeof ActivityKind];
+
+
+export const ActivityKind = {
+  import: 'import',
+  note: 'note',
+  selection: 'selection',
+  downtime: 'downtime',
+} as const;
+
+export interface Activity {
+  id: string;
+  archiveId: string;
+  title: string;
+  kind: ActivityKind;
+  before: string;
+  after: string;
+  createdAt: string;
+}
+
+export interface ActivityPage {
+  items: Activity[];
+  hasMore: boolean;
+}
+
 export interface AuthUser {
   id: string;
   /** @nullable */
@@ -24,4 +122,16 @@ export interface AuthUserEnvelope {
 export interface HealthStatus {
   status: string;
 }
+
+export type ListActivitiesParams = {
+/**
+ * @maxLength 200
+ */
+q?: string;
+day?: string;
+/**
+ * @minimum 0
+ */
+offset?: number;
+};
 

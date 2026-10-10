@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Rows3, House, LogOut, UserRound } from 'lucide-react';
+import { Rows3, House, LogOut, UserRound, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -12,11 +12,12 @@ import { SystemTerms } from './system-terms';
 const NAV = [
   { href: '/home', label: 'الرئيسية', icon: House },
   { href: '/sources', label: 'سجلات المصدر', icon: Rows3 },
+  { href: '/activity', label: 'سجل النشاطات', icon: History },
 ];
 
 export function Shell({ children, onLogout }: { children: ReactNode; onLogout: () => void }) {
   const [loc] = useLocation();
-  const { datasets, active, setActiveId } = useStore();
+  const { datasets, active, setActiveId, isArchiveLoading, archiveError, reloadArchives } = useStore();
   return (
     <div dir="rtl" className="min-h-[100dvh]">
       <header className="sticky top-0 z-30 border-b border-t-4 border-t-primary bg-background/95 backdrop-blur">
@@ -39,7 +40,7 @@ export function Shell({ children, onLogout }: { children: ReactNode; onLogout: (
               <Link
                 key={n.href}
                 href={n.href}
-                data-testid={`link-${n.href === '/home' ? 'compare' : 'sources'}`}
+                data-testid={`link-${n.href === '/home' ? 'compare' : n.href === '/activity' ? 'activity' : 'sources'}`}
                 aria-current={loc === n.href ? 'page' : undefined}
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-sm transition-colors',
@@ -79,12 +80,14 @@ export function Shell({ children, onLogout }: { children: ReactNode; onLogout: (
               ))}
             </select>
             <span className="text-muted-foreground">
-              {active.origin === 'user' ? 'نص رسالة — ليس ملف CSV ولا سجلاً معتمداً.' : 'معالج محلياً في هذه الجلسة — غير مُتحقق منه بشكل مستقل.'}
+              {active.origin === 'user' ? 'نص رسالة — ليس ملف CSV ولا سجلاً معتمداً.' : 'محفوظ في حسابك — لم يُتحقَّق من اعتماد المصدر بشكل مستقل.'}
             </span>
           </div>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6">
+        {isArchiveLoading && <p role="status" className="mb-4 text-sm text-muted-foreground">جارٍ تحميل ملفات حسابك…</p>}
+        {archiveError && <div role="alert" className="mb-4 rounded-md border border-destructive/40 p-3 text-sm text-destructive">{archiveError} <Button variant="outline" size="sm" onClick={() => void reloadArchives()}>إعادة المحاولة</Button></div>}
         {(loc === '/home' || loc === '/compare' || loc === '/sources') && <SystemTerms />}
         {children}
       </main>

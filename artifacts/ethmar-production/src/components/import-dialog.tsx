@@ -48,6 +48,7 @@ const GUESS: Record<MapKey, RegExp> = {
 };
 
 type PFile = {
+  file: File;
   id: string;
   name: string;
   size: number;
@@ -186,8 +187,13 @@ export function ImportDialog() {
   const [dtAssoc, setDtAssoc] = useState<Record<LineId, string[]>>({ 'E-01': [], 'E-02': [] });
   const inputRef = useRef<HTMLInputElement>(null);
   const seq = useRef(0);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const attemptRef = useRef<{ key: string; id: string } | null>(null);
 
   const reset = () => {
+    setSaveError(null);
+    attemptRef.current = null;
     setMappingTarget(null);
     setFiles([]);
     setNotices([]);
@@ -196,9 +202,13 @@ export function ImportDialog() {
     setDtAssoc({ 'E-01': [], 'E-02': [] });
   };
 
-  const importFiles = (incoming: PFile[], manual = false) => {
-    seq.current += 1;
-    const dsId = `csv-${seq.current}`;
+  const importFiles = async (incoming: PFile[], manual = false) => {
+    if (saving) return;
+    const key = incoming.map((f) => f.id).join('|');
+    if (attemptRef.current?.key !== key) attemptRef.current = { key, id: crypto.randomUUID() };
+    const dsId = attemptRef.current.id;
+    setSaving(true);
+    setSaveError(null);
     const candidates = buildCandidates(incoming);
     const records = candidates.map(({ rec, errors }) => ({
       ...rec, id: `${dsId}:${rec.id}`, datasetId: dsId,
@@ -213,23 +223,28 @@ export function ImportDialog() {
       // Events require an explicit user association, never an automatic sum.
       downtime[line] = manual ? (dtAssoc[line] ?? []).map((id) => `${dsId}:${id}`) : [];
     });
-    addDataset({
+    try {
+    await addDataset({
       id: dsId, origin: 'csv', title: `استيراد CSV — ${incoming.map((f) => f.name).join('، ')}`,
       files: incoming.map((f) => ({ name: f.name, size: f.size, delimiter: f.delimiter, dataRows: f.rows.length, hadBom: f.hadBom })),
       records, selection: selected, downtime,
-    });
+    }, incoming.map((f) => f.file));
     reset();
     setImportOpen(false);
     navigate('/sources');
+    } catch (error) {
+      setSaveError(error instanceof Error && !('status' in error) ? error.message : 'تعذر حفظ الاستيراد في حسابك. لم تُفقد الملفات المختارة؛ أعد المحاولة.');
+    } finally { setSaving(false); }
   };
 
   const onFiles = async (list: FileList | null) => {
-    if (!list) return;
+    if (!list || saving) return;
     const chosenFiles = Array.from(list);
     if (inputRef.current) inputRef.current.value = '';
     const next = [...files];
     const n: string[] = [];
     for (const file of chosenFiles) {
+      if (file.size > 5 * 1024 * 1024 || !file.name.toLowerCase().endsWith('.csv')) { n.push(`${file.name}: اختر CSV بحجم لا يتجاوز 5 ميجابايت.`); continue; }
       let text: string;
       try { text = await file.text(); }
       catch { n.push(`تعذّرت قراءة ${file.name}؛ يمكنك اختياره مجددًا.`); continue; }
@@ -240,6 +255,7 @@ export function ImportDialog() {
       const header = res.rows[0] ?? null;
       seq.current += 1;
       next.push({
+        file,
         id: `f${seq.current}`,
         name: file.name,
         size: file.size,
@@ -261,7 +277,7 @@ export function ImportDialog() {
     const needsMapping = next.find((f) => !f.header || ['run_id', 'event_id', 'record_type'].some((name) => !f.header!.cells.includes(name))
       || f.header.cells.some((name) => !Object.values(CANONICAL).includes(name)));
     if (next.length && !n.length && !needsMapping && next.every((f) => !f.error)) {
-      importFiles(next);
+      await importFiles(next);
     } else if (next.length) {
       setActiveFile(needsMapping?.id ?? next[0].id);
       setNotices((p) => [...p, 'راجع ربط الأعمدة والتنبيهات. كل صف بيانات يبقى متاحًا للمراجعة.']);
@@ -323,6 +339,7 @@ export function ImportDialog() {
     <Dialog
       open={importOpen}
       onOpenChange={(o) => {
+        if (saving) return;
         setImportOpen(o);
         if (!o) reset();
       }}
@@ -332,11 +349,13 @@ export function ImportDialog() {
           <DialogTitle className="text-base">استيراد سجلات الإنتاج من CSV</DialogTitle>
           <DialogDescription className="flex items-start gap-1.5 text-xs">
             <Lock className="mt-0.5 size-3.5 shrink-0" aria-hidden />
-            يُقرأ الملف محليًا داخل المتصفح فقط ولا يُرسل ولا يُحفظ. تبقى البيانات مؤقتًا في الذاكرة وتزول عند تحديث الصفحة. لا اتصال بنظام ERP.
+            يُحلَّل CSV داخل المتصفح، ثم يُرفع الملف الأصلي وتُحفظ البيانات والملاحظات في حسابك فقط. يمكنك الرجوع إليها من سجل النشاطات. لا تعديل ولا اتصال بنظام ERP. الحد 5 ميجابايت للملف و10 ميجابايت للاستيراد.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5 px-5 py-4">
+          {saving && <p role="status" className="rounded-md bg-secondary p-3 text-sm">جارٍ رفع الملفات وحفظها في حسابك… لا تغلق الصفحة حتى اكتمال الحفظ.</p>}
+          {saveError && <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">{saveError}</p>}
           {mappingTarget && (
             <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border bg-secondary p-3 text-sm" role="status">
               <span>انتقلنا إلى ربط الأعمدة تلقائيًا. راجع الحقول أدناه قبل عرض البيانات.</span>
@@ -351,7 +370,7 @@ export function ImportDialog() {
             </h3>
             <div className="flex flex-wrap items-center gap-2">
               <input ref={inputRef} type="file" accept=".csv,text/csv" multiple className="sr-only" id="csv-input" data-testid="input-csv-files" onChange={(e) => onFiles(e.target.files)} />
-              <Button type="button" size="sm" onClick={() => inputRef.current?.click()} data-testid="button-choose-files">
+              <Button type="button" size="sm" disabled={saving} onClick={() => inputRef.current?.click()} data-testid="button-choose-files">
                 <FileUp className="size-4" /> اختيار ملفات CSV
               </Button>
               <Button type="button" size="sm" variant="outline" onClick={downloadTemplate} data-testid="button-download-template">
@@ -578,11 +597,11 @@ export function ImportDialog() {
             )}
           </div>
           <div className="flex gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={() => { setImportOpen(false); reset(); }} data-testid="button-cancel-import">
+            <Button type="button" variant="outline" size="sm" disabled={saving} onClick={() => { setImportOpen(false); reset(); }} data-testid="button-cancel-import">
               إلغاء
             </Button>
-            <Button type="button" size="sm" disabled={blockers.length > 0} onClick={commit} data-testid="button-confirm-import">
-              عرض البيانات المستوردة
+            <Button type="button" size="sm" disabled={saving || blockers.length > 0} onClick={commit} data-testid="button-confirm-import">
+              {saving ? 'جارٍ الحفظ…' : saveError ? 'إعادة محاولة الحفظ' : 'حفظ وعرض البيانات المستوردة'}
             </Button>
           </div>
         </DialogFooter>

@@ -10,7 +10,7 @@ export function SystemTerms() {
         <summary className="cursor-pointer font-medium">المصطلحات المستخدمة في النظام</summary>
         <dl className="mt-3 grid gap-3 sm:grid-cols-3">
           <div><dt className="font-semibold">تخطيط موارد المؤسسات (ERP)</dt><dd className="mt-1 leading-6 text-muted-foreground">نظام إدارة الأعمال الحالي للمصنع.</dd></div>
-          <div><dt className="font-semibold">ملف CSV</dt><dd className="mt-1 leading-6 text-muted-foreground">ملف تصدير يشبه جدول البيانات، يحتوي على صفوف وأعمدة. يُقرأ محليًا داخل المتصفح دون إرسال الملف أو حفظه.</dd></div>
+          <div><dt className="font-semibold">ملف CSV</dt><dd className="mt-1 leading-6 text-muted-foreground">ملف تصدير يشبه جدول البيانات، يحتوي على صفوف وأعمدة. يُحلَّل داخل المتصفح ثم يُرفع ويُحفظ في حسابك، مع الملاحظات وسجل التغييرات، دون تعديل المصدر.</dd></div>
           <div><dt className="font-semibold">للقراءة فقط</dt><dd className="mt-1 leading-6 text-muted-foreground">هذا النموذج الأولي لا يستطيع تغيير النظام الأصلي أو ملف المصدر، ولا يرسل أي بيانات إلى ERP.</dd></div>
         </dl>
       </details>

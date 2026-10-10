@@ -1,1 +1,2 @@
 - [Production evidence scope](production-scope.md) — Read-only ERP evidence; user authorized private per-account CSV/notes/history storage, superseding local-only rules.
+- [Gemini availability](gemini-availability.md) — Model listing alone does not prove generation availability; validate with a real request.

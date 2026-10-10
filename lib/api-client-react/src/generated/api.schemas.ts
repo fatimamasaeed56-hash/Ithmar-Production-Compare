@@ -5,6 +5,35 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+export type ChatInputMessagesItemRole = typeof ChatInputMessagesItemRole[keyof typeof ChatInputMessagesItemRole];
+
+
+export const ChatInputMessagesItemRole = {
+  user: 'user',
+  assistant: 'assistant',
+} as const;
+
+export type ChatInputMessagesItem = {
+  role: ChatInputMessagesItemRole;
+  /**
+     * @minLength 1
+     * @maxLength 4000
+     */
+  content: string;
+};
+
+export interface ChatInput {
+  /**
+     * @minItems 1
+     * @maxItems 20
+     */
+  messages: ChatInputMessagesItem[];
+}
+
+export interface ChatReply {
+  reply: string;
+}
+
 export interface ArchiveUploadInput {
   /**
      * @minLength 1

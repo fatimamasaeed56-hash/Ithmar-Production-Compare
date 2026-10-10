@@ -8,6 +8,24 @@
 import * as zod from 'zod';
 
 
+export const sendChatBodyMessagesItemContentMax = 4000;
+
+export const sendChatBodyMessagesMax = 20;
+
+
+
+export const SendChatBody = zod.object({
+  "messages": zod.array(zod.object({
+  "role": zod.enum(['user', 'assistant']),
+  "content": zod.string().min(1).max(sendChatBodyMessagesItemContentMax)
+})).min(1).max(sendChatBodyMessagesMax)
+})
+
+export const SendChatResponse = zod.object({
+  "reply": zod.string()
+})
+
+
 export const prepareArchiveUploadBodyNameMax = 255;
 
 export const prepareArchiveUploadBodySizeMax = 5242880;

@@ -11,6 +11,26 @@ tags:
   - name: health
     description: Health operations
 paths:
+  /chat:
+    post:
+      operationId: sendChat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatInput"
+      responses:
+        "200":
+          description: Arabic assistant response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatReply"
+        "401":
+          description: Authentication required
+        "429":
+          description: Too many requests
   /archives/uploads:
     post:
       operationId: prepareArchiveUpload
@@ -172,6 +192,25 @@ paths:
                 $ref: "#/components/schemas/HealthStatus"
 components:
   schemas:
+    ChatInput:
+      type: object
+      required: [messages]
+      properties:
+        messages:
+          type: array
+          minItems: 1
+          maxItems: 20
+          items:
+            type: object
+            required: [role, content]
+            properties:
+              role: { type: string, enum: [user, assistant] }
+              content: { type: string, minLength: 1, maxLength: 4000 }
+    ChatReply:
+      type: object
+      required: [reply]
+      properties:
+        reply: { type: string }
     ArchiveUploadInput:
       type: object
       required: [name, size]

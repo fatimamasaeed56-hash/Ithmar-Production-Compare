@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Rows3, House, LogOut, UserRound, History } from 'lucide-react';
+import AiChat from './ai-chat';
 import { Button } from '@/components/ui/button';
 import { useStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -96,6 +97,7 @@ export function Shell({ children, onLogout }: { children: ReactNode; onLogout: (
       </footer>
       <SourceDetailDialog />
       <ImportDialog />
+      <AiChat />
     </div>
   );
 }

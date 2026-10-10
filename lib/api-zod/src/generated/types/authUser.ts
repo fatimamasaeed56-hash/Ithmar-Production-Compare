@@ -7,6 +7,7 @@
  */
 
 export interface AuthUser {
+  profileConfirmed?: boolean;
   id: string;
   /** @nullable */
   email: string | null;

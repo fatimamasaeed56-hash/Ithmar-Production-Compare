@@ -8,6 +8,29 @@
 import * as zod from 'zod';
 
 
+export const confirmProfileBodyFirstNameMax = 80;
+
+export const confirmProfileBodyLastNameMax = 80;
+
+
+
+export const ConfirmProfileBody = zod.object({
+  "firstName": zod.string().min(1).max(confirmProfileBodyFirstNameMax),
+  "lastName": zod.string().min(1).max(confirmProfileBodyLastNameMax)
+})
+
+export const ConfirmProfileResponse = zod.object({
+  "user": zod.union([zod.object({
+  "profileConfirmed": zod.boolean().optional(),
+  "id": zod.string(),
+  "email": zod.string().nullable(),
+  "firstName": zod.string().nullable(),
+  "lastName": zod.string().nullable(),
+  "profileImageUrl": zod.string().nullable()
+}),zod.null()])
+})
+
+
 export const sendChatBodyMessagesItemContentMax = 4000;
 
 export const sendChatBodyMessagesMax = 20;
@@ -164,6 +187,7 @@ export const ListActivitiesResponse = zod.object({
 
 export const GetCurrentAuthUserResponse = zod.object({
   "user": zod.union([zod.object({
+  "profileConfirmed": zod.boolean().optional(),
   "id": zod.string(),
   "email": zod.string().nullable(),
   "firstName": zod.string().nullable(),

@@ -18,6 +18,12 @@ The user explicitly authorized persistent per-account saving of imported CSV fil
 
 **Why:** The user explicitly confirmed upload/storage consent after being told it replaces the prior local-only behavior: “كل شخص يدخل للموقع ويعمل حساب يحفظ نشاطه وملفاته على حسابه”.
 
+Every authenticated sign-in must ask the user to enter or confirm their first and second names, including existing accounts. Refreshing the same confirmed session should not repeatedly interrupt them. Keep saved user-entered names rather than replacing them with identity-provider display names.
+
+**Why:** The user requested name collection “حتى لو كان عنده حساب فعلي على الويبسايت” and access for other accounts without weakening real authentication or merging their data.
+
+**How to apply:** Scope the confirmation to a login session; use identity-provider subject IDs, not entered names, for account ownership. Authorization flow cookies must be isolated per attempt so repeated clicks or tabs cannot overwrite each other's PKCE verifier.
+
 **How to apply:** Show E-02 minus E-01 for the requested scrap-rate and mold-change summaries: +5 percentage points and +2 hours for the supplied records. Keep the 45-minute unplanned stop separate and make no causal inference.
 
 The CSV intake must use PapaParse with header:true and skipEmptyLines:'greedy'. Entirely empty lines, including the trailing newline, are not incomplete data records. Missing values within data rows remain visible with warnings. Recognized run_id, event_id, record_type headers and an error-free parse trigger direct import; alternate headers trigger automatic navigation to column mapping. The same file can be chosen again.

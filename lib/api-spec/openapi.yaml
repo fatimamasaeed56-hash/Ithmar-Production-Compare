@@ -11,6 +11,22 @@ tags:
   - name: health
     description: Health operations
 paths:
+  /auth/profile:
+    post:
+      operationId: confirmProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileNames"
+      responses:
+        "200":
+          description: Confirmed names for current session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUserEnvelope"
   /chat:
     post:
       operationId: sendChat
@@ -192,6 +208,12 @@ paths:
                 $ref: "#/components/schemas/HealthStatus"
 components:
   schemas:
+    ProfileNames:
+      type: object
+      required: [firstName, lastName]
+      properties:
+        firstName: { type: string, minLength: 1, maxLength: 80 }
+        lastName: { type: string, minLength: 1, maxLength: 80 }
     ChatInput:
       type: object
       required: [messages]
@@ -307,6 +329,8 @@ components:
       type: object
       required: [id, email, firstName, lastName, profileImageUrl]
       properties:
+        profileConfirmed:
+          type: boolean
         id:
           type: string
         email:

@@ -27,3 +27,4 @@ export * from './chatInputMessagesItemRole';
 export * from './chatReply';
 export * from './healthStatus';
 export * from './listActivitiesParams';
+export * from './profileNames';

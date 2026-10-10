@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from 'express';
 import * as oidc from 'openid-client';
 import { db, usersTable } from '@workspace/db';
-import { GetCurrentAuthUserResponse } from '@workspace/api-zod';
+import { GetCurrentAuthUserResponse, ConfirmProfileBody } from '@workspace/api-zod';
 import { clearSession, createSession, getOidcConfig, getSession, getSessionId, updateSession, SESSION_COOKIE, SESSION_TTL } from '../lib/auth';
 import { profileName } from '../lib/profile-name';
 import { eq } from 'drizzle-orm';
@@ -26,8 +26,8 @@ function safeReturn(value: unknown, fallback = '/') {
   } catch { return fallback; }
 }
 
-function clearFlow(res: Response) {
-  for (const name of flowCookies) res.clearCookie(name, cookieOptions);
+function clearFlow(res: Response, suffix = '') {
+  for (const name of flowCookies) res.clearCookie(name + suffix, cookieOptions);
 }
 
 router.use((_req, res, next) => {
@@ -60,6 +60,28 @@ router.get('/auth/user', async (req, res) => {
   res.json(GetCurrentAuthUserResponse.parse({ user: req.isAuthenticated() ? req.user : null }));
 });
 
+router.post('/auth/profile', async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: 'يلزم تسجيل الدخول.' }); return; }
+  const source = req.get('origin');
+  let allowed = req.get('sec-fetch-site') !== 'cross-site';
+  try { if (source) allowed &&= new URL(source).host === (req.get('x-forwarded-host') || req.get('host')); }
+  catch { allowed = false; }
+  if (!allowed) { res.sendStatus(403); return; }
+  const parsed = ConfirmProfileBody.safeParse(req.body);
+  if (!parsed.success) { res.status(400).json({ error: 'أدخل الاسم الأول والاسم الثاني.' }); return; }
+  const names = { firstName: parsed.data.firstName.trim(), lastName: parsed.data.lastName.trim() };
+  if (Object.values(names).some((name) => !name || /[\u0000-\u001f\u007f]/.test(name))) {
+    res.status(400).json({ error: 'أدخل اسمين صالحين.' }); return;
+  }
+  const sid = getSessionId(req);
+  const session = sid ? await getSession(sid) : null;
+  if (!sid || !session) { res.sendStatus(401); return; }
+  await db.update(usersTable).set({ ...names, updatedAt: new Date() }).where(eq(usersTable.id, req.user.id));
+  session.user = { ...session.user, ...names, profileConfirmed: true };
+  await updateSession(sid, session);
+  res.json(GetCurrentAuthUserResponse.parse({ user: session.user }));
+});
+
 router.get('/login', async (req, res) => {
   try {
     const config = await getOidcConfig();
@@ -75,7 +97,9 @@ router.get('/login', async (req, res) => {
       state, nonce,
     });
     const values = [verifier, nonce, state, safeReturn(req.query.returnTo, '/home')];
-    flowCookies.forEach((name, i) => res.cookie(name, values[i], { ...cookieOptions, maxAge: 10 * 60 * 1000 }));
+    // Separate cookies per authorization attempt: another tab or repeated click
+    // must not overwrite the verifier for a still-valid login.
+    flowCookies.forEach((name, i) => res.cookie(`${name}_${state}`, values[i], { ...cookieOptions, maxAge: 10 * 60 * 1000 }));
     res.redirect(url.href);
   } catch (error) {
     req.log.error({ errorName: error instanceof Error ? error.name : 'Error' }, 'Login unavailable');
@@ -84,11 +108,13 @@ router.get('/login', async (req, res) => {
 });
 
 router.get('/callback', async (req, res) => {
-  const verifier = req.cookies?.code_verifier;
-  const nonce = req.cookies?.nonce;
-  const state = req.cookies?.state;
-  const returnTo = safeReturn(req.cookies?.return_to, '/home');
-  clearFlow(res);
+  const callbackState = typeof req.query.state === 'string' && /^[\w-]{16,128}$/.test(req.query.state) ? req.query.state : '';
+  const suffix = callbackState && req.cookies?.[`state_${callbackState}`] ? `_${callbackState}` : '';
+  const verifier = req.cookies?.[`code_verifier${suffix}`];
+  const nonce = req.cookies?.[`nonce${suffix}`];
+  const state = req.cookies?.[`state${suffix}`];
+  const returnTo = safeReturn(req.cookies?.[`return_to${suffix}`], '/home');
+  clearFlow(res, suffix);
   if (!verifier || !nonce || !state) {
     res.redirect('/?authError=expired');
     return;
@@ -102,10 +128,14 @@ router.get('/callback', async (req, res) => {
     const claims = tokens.claims();
     if (!claims?.sub) throw new Error('Missing subject');
     const nullableString = (value: unknown) => typeof value === 'string' ? value : null;
+    const [existing] = await db.select().from(usersTable).where(eq(usersTable.id, claims.sub));
+    const claimedNames = profileName(claims);
     const user = {
       id: claims.sub, email: nullableString(claims.email),
-      ...profileName(claims),
+      firstName: existing?.firstName || claimedNames.firstName,
+      lastName: existing?.lastName || claimedNames.lastName,
       profileImageUrl: nullableString(claims.profile_image_url ?? claims.picture),
+      profileConfirmed: false,
     };
     await db.insert(usersTable).values(user).onConflictDoUpdate({
       target: usersTable.id, set: { ...user, updatedAt: new Date() },
@@ -119,8 +149,11 @@ router.get('/callback', async (req, res) => {
     res.cookie(SESSION_COOKIE, sid, { ...cookieOptions, maxAge: SESSION_TTL });
     res.redirect(returnTo);
   } catch (error) {
-    req.log.warn({ errorName: error instanceof Error ? error.name : 'Error' }, 'Login verification failed');
-    res.redirect('/?authError=failed');
+    const code = error instanceof oidc.AuthorizationResponseError ? error.error : (error as { code?: string })?.code;
+    // Log only the bounded protocol error code; never callback URLs or tokens.
+    const safeCode = typeof code === 'string' && /^[A-Z_a-z]{1,80}$/.test(code) ? code : 'unknown';
+    req.log.warn({ errorName: error instanceof Error ? error.name : 'Error', code: safeCode }, 'Login verification failed');
+    res.redirect(`/?authError=${safeCode === 'access_denied' ? 'denied' : 'failed'}`);
   }
 });
 

@@ -7,6 +7,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import WelcomePage from '@/pages/welcome';
 import AccountPage from '@/pages/account';
+import ConfirmName from '@/pages/confirm-name';
 import { Shell } from '@/components/shell';
 import { StoreProvider } from '@/lib/store';
 import { Route, Switch, Redirect, useLocation, Router as WouterRouter } from 'wouter';
@@ -25,7 +26,7 @@ function Router() {
     <WelcomePage
       isAuthenticated={auth.isAuthenticated}
       isLoading={auth.isLoading}
-      error={auth.error || (authError ? 'لم يكتمل تسجيل الدخول. يمكنك المحاولة مرة أخرى.' : null)}
+      error={auth.error || (authError === 'denied' ? 'لم يمنح مزوّد تسجيل الدخول الإذن. أكمل الموافقة باستخدام حساب Replit الخاص بك؛ إذا ظهرت رسالة تقييد الوصول فتحقّق من إتاحة الموقع للآخرين.' : authError ? 'لم يكتمل تسجيل الدخول أو انتهت صلاحية المحاولة. ابدأ محاولة جديدة وأكملها في النافذة نفسها.' : null)}
       onLogin={auth.login}
       onEnter={() => navigate('/home')}
       onRetry={() => { window.history.replaceState(null, '', window.location.pathname); auth.retry(); }}
@@ -44,6 +45,7 @@ function Router() {
     </div>
   );
   if (!auth.isAuthenticated) return <><Redirect to="/" />{welcome}</>;
+  if (auth.user && !auth.user.profileConfirmed) return <ConfirmName key={auth.user.id} user={auth.user} onSaved={auth.retry} onLogout={auth.logout} />;
   return (
     <StoreProvider key={auth.user?.id}>
     {publicPage ? welcome : <Shell onLogout={auth.logout}>

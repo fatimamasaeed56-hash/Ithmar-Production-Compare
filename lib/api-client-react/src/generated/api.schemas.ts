@@ -5,6 +5,19 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+export interface ProfileNames {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  firstName: string;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  lastName: string;
+}
+
 export type ChatInputMessagesItemRole = typeof ChatInputMessagesItemRole[keyof typeof ChatInputMessagesItemRole];
 
 
@@ -133,6 +146,7 @@ export interface ActivityPage {
 }
 
 export interface AuthUser {
+  profileConfirmed?: boolean;
   id: string;
   /** @nullable */
   email: string | null;

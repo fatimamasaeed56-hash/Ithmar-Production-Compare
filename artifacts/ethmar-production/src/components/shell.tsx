@@ -14,7 +14,7 @@ const NAV = [
   { href: '/sources', label: 'سجلات المصدر', icon: Rows3 },
 ];
 
-export function Shell({ children, onLogout, userName }: { children: ReactNode; onLogout: () => void; userName: string }) {
+export function Shell({ children, onLogout }: { children: ReactNode; onLogout: () => void }) {
   const [loc] = useLocation();
   const { datasets, active, setActiveId } = useStore();
   return (
@@ -55,7 +55,6 @@ export function Shell({ children, onLogout, userName }: { children: ReactNode; o
             <Link href="/account" aria-current={loc === '/account' ? 'page' : undefined} data-testid="link-account" className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm text-primary hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <UserRound className="size-4" aria-hidden /><span>حسابي</span>
             </Link>
-            <span className="hidden max-w-28 truncate text-xs text-muted-foreground lg:inline" data-testid="user-name-display">{userName}</span>
             <Button size="sm" variant="ghost" onClick={onLogout} data-testid="button-logout" aria-label="تسجيل الخروج">
               <LogOut className="size-4" /><span className="hidden sm:inline">خروج</span>
             </Button>

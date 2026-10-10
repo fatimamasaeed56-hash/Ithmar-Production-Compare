@@ -45,7 +45,7 @@ function Router() {
   if (!auth.isAuthenticated) return <><Redirect to="/" />{welcome}</>;
   return (
     <StoreProvider key={auth.user?.id}>
-    {publicPage ? welcome : <Shell onLogout={auth.logout} userName={auth.user?.firstName || auth.user?.email || 'المستخدم'}>
+    {publicPage ? welcome : <Shell onLogout={auth.logout}>
       <RoutedErrorBoundary>
         <Suspense fallback={<div role="status">جارٍ تحميل الصفحة…</div>}>
         <Switch>

@@ -344,9 +344,16 @@ export function ImportDialog() {
         if (!o) reset();
       }}
     >
-      <DialogContent dir="rtl" className="max-h-[92dvh] max-w-4xl overflow-y-auto p-0 sm:rounded-md" data-testid="dialog-import">
-        <DialogHeader className="border-b px-5 pt-5 pb-3 text-start sm:text-start">
-          <DialogTitle className="text-base">استيراد سجلات الإنتاج من CSV</DialogTitle>
+      <DialogContent dir="rtl" showCloseButton={false} className="max-h-[92dvh] max-w-4xl overflow-y-auto p-0 sm:rounded-md" data-testid="dialog-import">
+        <DialogHeader className="sticky top-0 z-30 border-b bg-background px-5 pt-5 pb-3 text-start sm:text-start">
+          <div className="flex items-center justify-between gap-3">
+            <DialogTitle className="text-base">استيراد سجلات الإنتاج من CSV</DialogTitle>
+            <Button type="button" variant="outline" size="sm" className="shrink-0" disabled={saving}
+              data-testid="button-close-import" aria-label="إغلاق نافذة إدراج الملف"
+              onClick={() => { setImportOpen(false); reset(); }}>
+              إغلاق <span aria-hidden="true">×</span>
+            </Button>
+          </div>
           <DialogDescription className="flex items-start gap-1.5 text-xs">
             <Lock className="mt-0.5 size-3.5 shrink-0" aria-hidden />
             يُحلَّل CSV داخل المتصفح، ثم يُرفع الملف الأصلي وتُحفظ البيانات والملاحظات في حسابك فقط. يمكنك الرجوع إليها من سجل النشاطات. لا تعديل ولا اتصال بنظام ERP. الحد 5 ميجابايت للملف و10 ميجابايت للاستيراد.

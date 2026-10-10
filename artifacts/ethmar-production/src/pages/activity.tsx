@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'wouter';
 import { Download, RotateCcw, Search, History, FolderOpen } from 'lucide-react';
-import { useListActivities, type Activity } from '@workspace/api-client-react';
+import { listActivities, type Activity } from '@workspace/api-client-react';
+import { useQuery } from '@tanstack/react-query';
+import { groupActivities } from '@/lib/activity-groups';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useStore } from '@/lib/store';
@@ -41,7 +43,7 @@ function Value({ label, text, tone }: { label: string; text: string; tone: 'old'
   );
 }
 
-function Row({ a }: { a: Activity }) {
+function Row({ a, events }: { a: Activity; events: Activity[] }) {
   const { archives, datasets, setActiveId, isArchiveLoading, reloadArchives } = useStore();
   const [, navigate] = useLocation();
   const [err, setErr] = useState<string | null>(null);
@@ -75,13 +77,6 @@ function Row({ a }: { a: Activity }) {
           </Button>
         </div>
       )}
-      {a.kind !== 'import' && (a.before || a.after) && (
-        <div className="mt-3 grid gap-2 md:grid-cols-2">
-          <Value label="قبل التغيير (سجل تاريخي)" text={a.before} tone="old" />
-          <Value label="بعد التغيير (سجل تاريخي)" text={a.after} tone="new" />
-        </div>
-      )}
-      {a.kind === 'import' && a.after && <p dir="auto" className="mt-2 text-xs text-muted-foreground whitespace-pre-wrap">{a.after}</p>}
       {archive && archive.files.length > 0 && (
         <ul className="mt-3 flex flex-wrap gap-2">
           {archive.files.map((f) => (
@@ -95,11 +90,37 @@ function Row({ a }: { a: Activity }) {
           ))}
         </ul>
       )}
-      {archive && a.kind === 'note' && (
+      {archive && archive.note && (
         <div className="mt-2">
           <Value label="الملاحظة الحالية المحفوظة" text={archive.note} tone="new" />
         </div>
       )}
+      <details className="mt-3 border-t pt-2">
+        <summary className="cursor-pointer text-xs text-primary">
+          عرض سجل الملاحظات والتعديلات ({events.length})
+        </summary>
+        <ol className="mt-3 space-y-3">
+          {events.map((event) => (
+            <li key={event.id} className="rounded border p-2 text-xs">
+              <p className="text-muted-foreground">
+                {KIND[event.kind]?.t} · {dayLabel(event.createdAt)} · {timeLabel(event.createdAt)}
+              </p>
+              {event.kind !== 'import' && (
+                <div className="mt-2 grid gap-2 md:grid-cols-2">
+                  <Value label="قبل التغيير" text={event.before} tone="old" />
+                  <Value label="بعد التغيير" text={event.after} tone="new" />
+                </div>
+              )}
+              {event.archiveId !== a.archiveId && (
+                <Button variant="ghost" size="sm" className="mt-2"
+                  onClick={() => { setActiveId(event.archiveId); navigate('/sources'); }}>
+                  فتح النسخة المرتبطة بهذا التعديل
+                </Button>
+              )}
+            </li>
+          ))}
+        </ol>
+      </details>
     </li>
   );
 }
@@ -109,7 +130,7 @@ export default function ActivityPage({ userId }: { userId: string }) {
   const [q, setQ] = useState('');
   const [day, setDay] = useState('');
   const [offset, setOffset] = useState(0);
-  const { archiveError } = useStore();
+  const { archiveError, archives } = useStore();
 
   useEffect(() => {
     const t = setTimeout(() => setQ(input.trim()), 400);
@@ -118,27 +139,37 @@ export default function ActivityPage({ userId }: { userId: string }) {
   useEffect(() => setOffset(0), [q, day]);
 
   const validDay = !day || /^\d{4}-\d{2}-\d{2}$/.test(day);
-  const params = { q: q || undefined, day: validDay ? day || undefined : undefined, offset };
-  const { data, isLoading, isError, refetch, isFetching } = useListActivities(params, {
-    query: { queryKey: ['activities', userId, params], enabled: validDay, retry: false },
+  const params = { q: q || undefined, day: validDay ? day || undefined : undefined };
+  const { data, isLoading, isError, refetch, isFetching } = useQuery({
+    queryKey: ['activities', userId, params], enabled: validDay, retry: false,
+    queryFn: async ({ signal }) => {
+      const items: Activity[] = [];
+      for (let cursor = 0; ; cursor += PAGE) {
+        const page = await listActivities({ ...params, offset: cursor }, { signal });
+        items.push(...page.items);
+        if (!page.hasMore) return items;
+      }
+    },
   });
 
+  const fileGroups = useMemo(() => groupActivities(data ?? [], archives), [data, archives]);
   const groups = useMemo(() => {
-    const m = new Map<string, { label: string; items: Activity[] }>();
-    for (const a of data?.items ?? []) {
+    const m = new Map<string, { label: string; items: Activity[][] }>();
+    for (const events of fileGroups.slice(offset, offset + PAGE)) {
+      const a = events[0];
       const k = dayKey(a.createdAt);
       if (!m.has(k)) m.set(k, { label: dayLabel(a.createdAt), items: [] });
-      m.get(k)!.items.push(a);
+      m.get(k)!.items.push(events);
     }
     return [...m.entries()];
-  }, [data]);
+  }, [fileGroups, offset]);
 
   return (
     <div className="space-y-5">
       <div className="rise">
         <h1 className="text-2xl font-semibold tracking-tight">سجل النشاطات</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          أرشيفك اليومي الخاص: الملفات المستوردة والملاحظات وتغييرات الاختيار، مرتبة زمنيًا بتوقيت الخليل ({TZ}).
+          يظهر كل ملف مرة واحدة، وملاحظاته وتعديلاته داخل سجله. مرتبة حسب آخر نشاط بتوقيت الخليل ({TZ}).
         </p>
       </div>
       <form className="flex flex-wrap items-end gap-2 rounded-md border bg-card p-3"
@@ -178,17 +209,17 @@ export default function ActivityPage({ userId }: { userId: string }) {
               <h2 className="sticky top-0 z-10 mb-2 border-b bg-background/95 py-1 text-sm font-semibold text-primary">
                 {g.label} <span className="text-[11px] font-normal text-muted-foreground">· {TZ}</span>
               </h2>
-              <ol className="space-y-2">{g.items.map((a) => <Row key={a.id} a={a} />)}</ol>
+              <ol className="space-y-2">{g.items.map((events) => <Row key={events[0].id} a={events[0]} events={events} />)}</ol>
             </section>
           ))}
         </div>
       )}
 
-      {(offset > 0 || data?.hasMore) && (
+      {(offset > 0 || fileGroups.length > PAGE) && (
         <div className="flex items-center justify-between">
           <Button variant="outline" disabled={offset === 0 || isFetching} onClick={() => setOffset(Math.max(0, offset - PAGE))}>الأحدث</Button>
-          <span className="num text-xs text-muted-foreground">{offset + 1} – {offset + (data?.items.length ?? 0)}</span>
-          <Button variant="outline" disabled={!data?.hasMore || isFetching} onClick={() => setOffset(offset + PAGE)}>الأقدم</Button>
+          <span className="num text-xs text-muted-foreground">{offset + 1} – {Math.min(offset + PAGE, fileGroups.length)} / {fileGroups.length} ملف</span>
+          <Button variant="outline" disabled={offset + PAGE >= fileGroups.length || isFetching} onClick={() => setOffset(offset + PAGE)}>الأقدم</Button>
         </div>
       )}
     </div>

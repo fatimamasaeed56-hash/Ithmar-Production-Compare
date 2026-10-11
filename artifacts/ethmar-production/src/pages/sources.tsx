@@ -1,5 +1,6 @@
-import { useState } from 'react';
 import { Eye, FileUp, X } from 'lucide-react';
+import { Link } from 'wouter';
+import { sourceDay, SOURCE_TIME_ZONE } from '@/lib/source-workspace';
 import { Button } from '@/components/ui/button';
 import { FIELD_META, FIELDS, LINES, type Dataset } from '@/lib/data';
 import { useStore } from '@/lib/store';
@@ -9,8 +10,9 @@ import { DataIssues } from '@/components/data-issues';
 import { Textarea } from '@/components/ui/textarea';
 
 function DatasetBlock({ ds }: { ds: Dataset }) {
-  const [closed, setClosed] = useState(false);
-  const { active, setActiveId, openTrace, selectRecord, toggleDowntime, notes, setNote, saveStates, retrySave, restoreSaved, archives } = useStore();
+  const { active, setActiveId, openTrace, selectRecord, toggleDowntime, notes, setNote, saveStates, retrySave, restoreSaved, archives, sourceWindows, closeSource } = useStore();
+  const opened = sourceWindows[ds.id];
+  const closed = opened?.closed ?? false;
   const isActive = active.id === ds.id;
   const status = (id: string) => {
     if (Object.values(ds.selection).includes(id)) return { t: 'تشغيل مختار', c: 'bg-primary text-primary-foreground' };
@@ -22,6 +24,11 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
       <div className="flex flex-wrap items-center gap-2 border-b px-4 py-3">
         <OriginBadge origin={ds.origin} />
         <h2 className="text-sm font-semibold break-all">{ds.title}</h2>
+        {opened && (
+          <time dateTime={opened.openedAt} className="text-xs text-muted-foreground" data-testid={`source-opened-at-${ds.id}`}>
+            فُتح الساعة {new Intl.DateTimeFormat('ar', { timeZone: SOURCE_TIME_ZONE, hour: '2-digit', minute: '2-digit' }).format(new Date(opened.openedAt))} · بتوقيت فلسطين
+          </time>
+        )}
         {isActive ? (
           <span className="ms-auto text-xs text-primary">المصدر النشط</span>
         ) : (
@@ -32,7 +39,7 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
         {ds.origin === 'csv' && (
           <Button size="sm" variant="outline" className="h-7"
             disabled={!closed && (saveStates[ds.id]?.status === 'saving' || saveStates[ds.id]?.status === 'error')}
-            onClick={() => setClosed((value) => !value)}
+            onClick={() => closed ? setActiveId(ds.id) : closeSource(ds.id)}
             aria-expanded={!closed} aria-controls={`source-content-${ds.id}`}
             data-testid={`button-close-source-${ds.id}`}>
             {closed ? <Eye className="size-3.5" /> : <X className="size-3.5" />}
@@ -183,7 +190,12 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
 }
 
 export default function SourcesPage() {
-  const { datasets, setImportOpen } = useStore();
+  const { datasets, setImportOpen, sourceWindows, sourceDay: today, sourceStorageError, saveStates, isArchiveLoading, archiveError } = useStore();
+  const visible = datasets.filter((ds) => {
+    const opened = sourceWindows[ds.id];
+    return ds.origin !== 'csv' || (opened && sourceDay(opened.openedAt) === today)
+      || saveStates[ds.id]?.status === 'saving' || saveStates[ds.id]?.status === 'error';
+  });
   return (
     <div className="space-y-5">
       <div className="rise flex flex-wrap items-end justify-between gap-3">
@@ -192,12 +204,23 @@ export default function SourcesPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             كل السجلات كما وردت، للقراءة فقط. «—» حقل غير موجود في السجل، و«غير معروف» خلية فارغة.
           </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            الملفات المفتوحة اليوم على هذا المتصفح فقط. يُغلق عرضها عند الساعة 12:00 منتصف الليل بتوقيت فلسطين، وتبقى محفوظة في سجل النشاطات ويمكن فتحها مجددًا.
+          </p>
         </div>
       </div>
       <div className="flex justify-end">
         <Button variant="default" onClick={() => setImportOpen(true)} data-testid="button-sources-import"><FileUp className="size-4" /> استيراد CSV</Button>
       </div>
-      {datasets.map((d) => (
+      {sourceStorageError && <p role="alert" className="text-xs text-destructive">تعذر حفظ حالة عرض الملفات في هذا المتصفح؛ قد تحتاج إلى إعادة فتحها بعد تحديث الصفحة. ملفاتك محفوظة في الحساب.</p>}
+      {archiveError && <p role="alert" className="text-xs text-destructive">{archiveError}</p>}
+      {isArchiveLoading && <p role="status" className="text-sm text-muted-foreground">جارٍ تحميل الملفات…</p>}
+      {!isArchiveLoading && !visible.some((ds) => ds.origin === 'csv') && (
+        <div className="rounded-md border border-dashed bg-card p-5 text-sm">
+          لا توجد ملفات مستوردة مفتوحة اليوم. <Link href="/activity" className="text-primary underline">افتح ملفًا محفوظًا من سجل النشاطات</Link> أو استورد ملفًا جديدًا.
+        </div>
+      )}
+      {visible.map((d) => (
         <DatasetBlock key={d.id} ds={d} />
       ))}
     </div>

@@ -2,10 +2,13 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useQueryClient } from '@tanstack/react-query';
 import { createArchive, listArchives, prepareArchiveUpload, updateArchive, type Archive, type ArchiveUpdate } from '@workspace/api-client-react';
 import { USER_DATASET, type Dataset, type Metric, type SourceRecord, type LineId } from './data';
+import { useSourceWorkspace } from './use-source-workspace';
+import type { SourceWindows } from './source-workspace';
 
 export type TraceTarget = { metric: Metric } | { recordId: string };
 type SaveState = { status: 'saving' | 'saved' | 'error'; message?: string };
 type Store = {
+  sourceWindows: SourceWindows; sourceDay: string; closeSource: (id: string) => void; sourceStorageError: boolean;
   datasets: Dataset[]; active: Dataset; setActiveId: (id: string) => void;
   addDataset: (ds: Dataset, files: File[]) => Promise<void>;
   notes: Record<string, string>; setNote: (datasetId: string, text: string) => void;
@@ -28,10 +31,15 @@ const errorMessage = (error: unknown) => {
       : 'تعذر الحفظ في الحساب. التغييرات الحالية ما زالت في هذه الصفحة فقط؛ أعد المحاولة قبل المغادرة.';
 };
 
-export function StoreProvider({ children }: { children: ReactNode }) {
+export function StoreProvider({ children, userId }: { children: ReactNode; userId: string }) {
   const queryClient = useQueryClient();
+  const sourceWorkspace = useSourceWorkspace(userId);
   const [datasets, setDatasets] = useState<Dataset[]>([USER_DATASET]);
-  const [activeId, setActiveId] = useState(USER_DATASET.id);
+  const [activeId, updateActiveId] = useState(USER_DATASET.id);
+  const setActiveId = (id: string) => {
+    updateActiveId(id);
+    if (id !== USER_DATASET.id) sourceWorkspace.open(id);
+  };
   const [trace, setTrace] = useState<TraceTarget | null>(null);
   const [importOpen, setImportOpen] = useState(false);
   const [notes, setNotes] = useState<Record<string, string>>({});
@@ -150,6 +158,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const byId = useMemo(() => new Map(datasets.flatMap((d) => d.records.map((r) => [r.id, r] as const))), [datasets]);
   const active = datasets.find((d) => d.id === activeId) ?? datasets[0];
   const value: Store = {
+    sourceWindows: sourceWorkspace.windows, sourceDay: sourceWorkspace.day,
+    closeSource: sourceWorkspace.close, sourceStorageError: sourceWorkspace.storageError,
     datasets, active, setActiveId, addDataset, notes, archives, isArchiveLoading, archiveError, reloadArchives, saveStates,
     retrySave: (id) => { void pump(id); },
     restoreSaved: async (id) => {

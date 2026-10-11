@@ -134,7 +134,6 @@ export default function AiChat() {
           className="flex h-[100dvh] max-h-[100dvh] max-w-none flex-col gap-0 overflow-hidden border-primary/20 bg-card p-0 text-right sm:h-[min(640px,85vh)] sm:max-w-md sm:rounded-xl"
         >
           <header className="flex items-center gap-3 border-b border-t-4 border-t-primary bg-card px-4 py-3">
-            <img src={`${import.meta.env.BASE_URL}ithmar-logo-updated.png`} alt="" aria-hidden className="h-7 w-auto shrink-0" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
             <div className="min-w-0 flex-1">
               <DialogTitle className="text-sm font-semibold text-primary">المساعد الذكي</DialogTitle>
               <DialogDescription className="text-[11px] text-muted-foreground">إرشاد عام — لا يطّلع على بيانات الإنتاج</DialogDescription>

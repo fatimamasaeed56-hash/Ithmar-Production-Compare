@@ -36,7 +36,7 @@ function Router() {
     <div dir="rtl" className="flex min-h-screen flex-col bg-background text-primary">
       <header className="border-b border-t-4 border-t-primary px-4 py-3">
         <div className="mx-auto max-w-6xl">
-          <img src={`${import.meta.env.BASE_URL}ithmar-logo-updated.png`} alt="إثمار للصناعات البلاستيكية" width={819} height={331} className="h-auto w-48 sm:w-56" />
+          <span className="text-lg font-semibold">مقارنة سجلات الإنتاج</span>
         </div>
       </header>
       <div role="status" className="grid flex-1 place-items-center">جارٍ التحقق من جلسة الدخول…</div>

@@ -13,17 +13,17 @@ type Props = {
 };
 
 const GOALS = [
-  { icon: Factory, title: 'قاعدة إنتاجية متينة', body: 'نسعى إلى بناء قاعدة إنتاج قوية تكون أساساً راسخاً لعملنا.' },
-  { icon: Package, title: 'خدمة السوق المحلي', body: 'نطمح إلى تقديم خدمات محلية للسوق في جميع أنواع العبوات البلاستيكية، بأعلى معايير الجودة وأفضل الأسعار.' },
-  { icon: Cpu, title: 'اختيار المنتج مع العميل', body: 'نعمل على أن يختار العميل منتجه بنفسه، مع استخدام أجهزة CNC متقدمة في تنفيذ المنتجات.' },
-  { icon: GraduationCap, title: 'تدريب متكامل', body: 'نهدف إلى توفير تدريب كامل على أجهزة CNC المتقدمة وعلى المنتجات كذلك.' },
+  { icon: Factory, title: 'مقارنة الإنتاج', body: 'قارن مدخلات المواد والإنتاج السليم والخردة وأوقات تغيير القالب بين تشغيلين.' },
+  { icon: Package, title: 'استيراد سجلات CSV', body: 'راجع ملفات التصدير مع تنبيهات للقيم الناقصة والصفوف المكررة.' },
+  { icon: Cpu, title: 'تتبّع كل رقم', body: 'ارجع من المؤشر إلى صف المصدر وقيمه الأصلية دون تعديل نظام شركتك.' },
+  { icon: GraduationCap, title: 'أرشيف خاص بحسابك', body: 'احتفظ بملفاتك وملاحظاتك وسجل تعديلاتك للرجوع إليها عند الحاجة.' },
 ];
 
 const EN_GOALS = [
-  { icon: Factory, title: 'A strong production base', body: 'We aim to build a strong production base as a solid foundation for our work.' },
-  { icon: Package, title: 'Serving the local market', body: 'We aspire to provide local services for all types of plastic packaging, with the highest quality standards and the best prices.' },
-  { icon: Cpu, title: 'Customer product selection', body: 'We work to support customers in choosing their products, using advanced CNC equipment in production.' },
-  { icon: GraduationCap, title: 'Comprehensive training', body: 'We aim to provide full training on advanced CNC equipment and products.' },
+  { icon: Factory, title: 'Compare production', body: 'Compare material inputs, good output, scrap and mold-change time between two runs.' },
+  { icon: Package, title: 'Import CSV records', body: 'Review exported files with warnings for missing values and duplicate rows.' },
+  { icon: Cpu, title: 'Trace every number', body: 'Open the original source row behind each metric without modifying your company’s system.' },
+  { icon: GraduationCap, title: 'Your private archive', body: 'Keep files, notes and change history in your account for future reference.' },
 ];
 
 export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin, onEnter, onRetry }: Props) {
@@ -41,8 +41,8 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
     root.lang = language;
     root.dir = language === 'ar' ? 'rtl' : 'ltr';
     document.title = language === 'ar'
-      ? 'إثمار للصناعات البلاستيكية — أهلاً بكم'
-      : 'Ithmar Plastic Industries — Welcome';
+      ? 'مقارنة سجلات الإنتاج — أهلاً بكم'
+      : 'Production Comparison — Welcome';
     return () => {
       root.lang = previous.lang;
       root.dir = previous.dir;
@@ -63,7 +63,6 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
     window.history.replaceState(window.history.state, '', url);
     setLanguage(next);
   };
-  const logoSrc = `${import.meta.env.BASE_URL}ithmar-logo-updated.png`;
   return (
     <div dir={ar ? 'rtl' : 'ltr'} lang={language} className="relative min-h-[100dvh] overflow-x-hidden bg-background">
       <div aria-hidden className="paper-grid pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
@@ -71,7 +70,7 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
 
       <div className="relative mx-auto max-w-[1440px] px-4 pb-10 pt-6 sm:px-6 lg:px-10">
         <header className="rise flex items-center justify-between gap-4">
-          <img src={logoSrc} alt={t('إثمار للصناعات البلاستيكية', 'Ithmar Plastic Industries')} width={819} height={331} className="h-auto w-44 mix-blend-multiply sm:w-60" data-testid="img-logo" />
+          <span className="text-lg font-semibold text-primary sm:text-xl">{t('مقارنة سجلات الإنتاج', 'Production Comparison')}</span>
           <Button variant="outline" onClick={switchLanguage} aria-label={ar ? 'Switch to English' : 'التبديل إلى العربية'} lang={ar ? 'en' : 'ar'} data-testid="button-language">
             {ar ? 'English' : 'العربية'}
           </Button>
@@ -82,7 +81,7 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
             <img src={`${import.meta.env.BASE_URL}welcome-line.jpg`} alt="" aria-hidden className="absolute inset-0 -z-20 h-full w-full object-cover" />
             <div aria-hidden className={`absolute inset-0 -z-10 ${ar ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-[hsl(146_35%_14%/.94)] via-[hsl(146_32%_18%/.78)] to-[hsl(146_30%_20%/.25)]`} />
             <div className="flex flex-1 flex-col p-6 sm:p-10">
-              <p className="w-fit rounded-full bg-white/15 px-3 py-1 text-xs font-semibold tracking-wide text-[hsl(95_60%_85%)]">{t('إثمار للصناعات البلاستيكية', 'Ithmar Plastic Industries')}</p>
+              <p className="w-fit rounded-full bg-white/15 px-3 py-1 text-xs font-semibold tracking-wide text-[hsl(95_60%_85%)]">{t('أداة للشركات وفرق الإنتاج', 'For companies and production teams')}</p>
               <h1 className="mt-5 max-w-xl text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
                 {t('أهلاً بكم في أداة', 'Welcome to')}
                 <span className="block text-[hsl(95_55%_75%)]">{t('مقارنة سجلات الإنتاج', 'Production Comparison')}</span>
@@ -92,7 +91,7 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
               </Button>
 
               <div className="mt-auto pt-10">
-                <h2 className="flex items-center gap-3 text-sm font-semibold"><span className="h-px w-8 bg-white/60" /> {t('تطلعاتنا', 'Our goals')}</h2>
+                <h2 className="flex items-center gap-3 text-sm font-semibold"><span className="h-px w-8 bg-white/60" /> {t('ما تقدمه الأداة', 'What you can do')}</h2>
                 <ol className="mt-4 grid gap-px overflow-hidden rounded-lg border border-white/15 bg-white/15 sm:grid-cols-2">
                   {(ar ? GOALS : EN_GOALS).map((g, i) => (
                     <li key={g.title} className="rise bg-[hsl(146_32%_14%/.72)] p-4 backdrop-blur-sm" style={{ animationDelay: `${120 + i * 80}ms` }} data-testid={`card-goal-${i}`}>
@@ -105,13 +104,13 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
                     </li>
                   ))}
                 </ol>
-                <p className="mt-3 text-[11px] text-white/65">{t('تُعرض هذه البنود بوصفها أهدافاً وتطلعات للشركة، لا شهادات أو إحصاءات. الصورة توضيحية.', 'These are company goals and aspirations, not certifications or statistics. Image is illustrative.')}</p>
+                <p className="mt-3 text-[11px] text-white/65">{t('الصورة توضيحية ولا تمثل شركة بعينها.', 'Illustrative image; it does not represent a specific company.')}</p>
                 <details className="mt-3 rounded-md border border-white/15 bg-white/10 px-4 py-3 text-sm" data-testid="details-goals-original">
-                  <summary className="cursor-pointer select-none font-medium">{t('أهداف الشركة', 'Company goals')}</summary>
+                  <summary className="cursor-pointer select-none font-medium">{t('عن المنصة', 'About the platform')}</summary>
                   <p dir={ar ? 'rtl' : 'ltr'} lang={language} className="mt-3 text-start leading-7 text-white/80">
                     {t(
-                      'تركّز الشركة على بناء قاعدة إنتاجية قوية ووكالة تعمل على تزويد السوق المحلي بخدمات محلية في جميع أنواع العبوات البلاستيكية، بأعلى معايير الجودة وأفضل الأسعار، إضافةً إلى إتاحة اختيار المنتجات للعميل وتقديم تدريب متكامل باستخدام أجهزة CNC المتقدمة على المنتجات كذلك.',
-                      'The company focuses on building a strong production base and an agency that works to provide the local market with local services in all types of plastic packaging with the highest quality standards and the best prices, in addition to any product selection before the customer and full training by advanced CNC devices on the products as well',
+                      'منصة عامة لمراجعة صادرات الإنتاج المعتمدة ومقارنة مؤشراتها. تستخدم بيانات الملفات التي تستوردها، مع تتبّع المصدر وحفظ الملاحظات في حسابك، دون تعديل نظام إدارة الأعمال الأصلي.',
+                      'A general-purpose platform for reviewing approved production exports and comparing their metrics. Work with your imported files, trace values to their sources and save notes in your account without modifying the original business management system.',
                     )}
                   </p>
                 </details>
@@ -121,7 +120,7 @@ export default function WelcomePage({ isAuthenticated, isLoading, error, onLogin
 
           <aside ref={panelRef} className="rise grid scroll-mt-4 overflow-hidden rounded-xl border bg-card sm:grid-cols-[0.8fr_1.2fr] lg:grid-cols-1 xl:grid-cols-[0.75fr_1.25fr]" style={{ animationDelay: '120ms' }} data-testid="login-panel">
             <div className="flex flex-col justify-between gap-6 bg-secondary p-6">
-              <img src={logoSrc} alt={t('إثمار للصناعات البلاستيكية', 'Ithmar Plastic Industries')} width={819} height={331} className="h-auto w-48 max-w-full mix-blend-multiply" data-testid="login-logo" />
+              <p className="text-lg font-semibold text-primary">{t('مساحة عمل الإنتاج', 'Production workspace')}</p>
               <div>
                 <p className="font-semibold text-secondary-foreground">{t('أهلاً بعودتك', 'Welcome back')}</p>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">{t('ادخل ببريدك الإلكتروني وكلمة المرور للوصول إلى مقارنة سجلات الإنتاج.', 'Sign in with your email and password to reach production comparison.')}</p>

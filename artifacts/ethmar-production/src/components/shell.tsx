@@ -24,17 +24,9 @@ export function Shell({ children, onLogout }: { children: ReactNode; onLogout: (
       <header className="sticky top-0 z-30 border-b border-t-4 border-t-primary bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
           <div className="flex items-center gap-3 max-sm:w-full">
-            <Link href="/home" aria-label="إثمار للصناعات البلاستيكية — الصفحة الرئيسية" className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-              <img
-                src={`${import.meta.env.BASE_URL}ithmar-logo-updated.png`}
-                alt="Ithmar Plastic Industries — إثمار للصناعات البلاستيكية"
-                width={819}
-                height={331}
-                className="h-auto w-48 sm:w-56"
-                data-testid="header-logo"
-              />
+            <Link href="/home" aria-label="مقارنة سجلات الإنتاج — الصفحة الرئيسية" className="shrink-0 rounded-sm text-lg font-semibold text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              مقارنة سجلات الإنتاج
             </Link>
-            <span className="border-s border-border ps-3 text-xs font-medium text-primary">مقارنة سجلات الإنتاج</span>
           </div>
           <nav className="flex gap-1" aria-label="التنقل الرئيسي">
             {NAV.map((n) => (

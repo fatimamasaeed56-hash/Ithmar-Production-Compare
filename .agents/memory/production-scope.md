@@ -1,5 +1,5 @@
 ---
-name: ETHMAR production scope
+name: Production comparison scope
 description: User-defined evidence and read-only constraints for production comparison
 ---
 
@@ -44,32 +44,26 @@ The CSV intake must use PapaParse with header:true and skipEmptyLines:'greedy'. 
 
 **How to apply:** Preserve original physical row positions and raw values; do not treat skipped blank lines as records or renumber source rows after skipping them.
 
-The user wants a separate welcome page combining company goals and real login on the same page. They supplied goals about a strong production base, local plastic-packaging services, quality and prices, customer product selection, and training with advanced CNC equipment.
+The user now wants a general-purpose site usable by any company, without the company logo or company-specific identity, including in the AI assistant. This supersedes earlier requests to place the Ithmar logo on every page and display that company's goals.
 
-**Why:** These are company-provided aspirations, not independently verified certifications or performance figures.
+**Why:** The user said “احذف شعار اللشركة وعلى مساعد الذكي , خلي كلشي عام يعنى بتقدر اي شركة تستخدم هاد الموقع”.
 
-**How to apply:** Keep the green uploaded brand identity and integrated transparent logo. Do not invent certifications, statistics, or expand the ambiguous CNC wording into detailed service promises.
-
-Place a clear company logo at the top of every page, not as a large background watermark.
-
-**Why:** The user explicitly chose “شعار واضح أعلى كل صفحة” over a full-interface background.
-
-**How to apply:** Preserve the transparent logo and its visible top placement in both public and signed-in interfaces, including mobile layouts.
+**How to apply:** Retain the green styling and layout, but use neutral production-comparison wording throughout welcome, login, headers, metadata and assistant identity. Do not reintroduce a company logo or company-specific promises. Preserve existing accounts and data; this is not permission to merge companies' records.
 
 The user explicitly reversed the earlier choice of separate demo access: they now want real login only, no demo access.
 
 **Why:** The user said “مابدي دخول تجريبي بدي دخول حقيقي”.
 
-**How to apply:** Do not reintroduce any-email demo entry or authentication bypass. Keep the language switch; the company-goals statement at the bottom must follow the selected language too.
+**How to apply:** Do not reintroduce any-email demo entry or authentication bypass. Keep the language switch and translate all welcome content.
 
 Use the user's supplied welcome/login reference for its division into a large welcome panel and an adjacent split login panel, not for its blue colors or alternate logo.
 
 **Why:** The user asked for “بس الفكرة والتقسيم” while keeping the established theme.
 
-**How to apply:** Preserve green Ithmar branding and real provider authentication; the reference's email/password fields do not authorize replacing authentication with a cosmetic form.
+**How to apply:** Preserve the green theme and real authentication; the reference's email/password fields do not authorize replacing authentication with a cosmetic form.
 
 The user reiterated that the entire welcome page must switch between Arabic and English, not just the login section.
 
 **Why:** They explicitly requested “الصفحة كاملة” after prior language changes.
 
-**How to apply:** Apply the language to welcome content, all login states, goals, document direction and title. Keep the supplied bilingual logo unchanged.
+**How to apply:** Apply the language to welcome content, all login states, feature descriptions, document direction and title.

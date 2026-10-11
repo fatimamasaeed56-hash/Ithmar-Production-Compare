@@ -21,7 +21,7 @@ export default function ConfirmName({ user, onSaved, onLogout }: { user: AuthUse
   }
   return <main dir="rtl" className="grid min-h-dvh place-items-center bg-background px-4 py-8">
     <section className="w-full max-w-md rounded-xl border border-primary/20 border-t-4 border-t-primary bg-card p-6 shadow-sm">
-      <img src={`${import.meta.env.BASE_URL}ithmar-logo-updated.png`} alt="إثمار للصناعات البلاستيكية" className="mx-auto mb-6 w-56" />
+      <p className="mb-6 text-center text-lg font-semibold text-primary">مقارنة سجلات الإنتاج</p>
       <h1 className="text-xl font-bold text-primary">أهلًا بك، ما اسمك؟</h1>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">أدخل الاسم الأول والاسم الثاني أو أكّدهما للمتابعة. نطلب تأكيد الاسم عند كل تسجيل دخول، حتى للحسابات المسجّلة سابقًا.</p>
       <form onSubmit={save} className="mt-6 space-y-4">

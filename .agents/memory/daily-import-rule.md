@@ -16,6 +16,8 @@ The user clarified that repeated file cards in activity history are unacceptable
 
 Source-records daily workspace: the user wants files opened today not to remain open the next day, while remaining in activity history, and wants the opening time displayed beside each file. The user explicitly specified 12:00 midnight Palestine time as the cutoff.
 
+Order this working view by most recent opening first; reopening an older file should bring it to the top, not leave it below earlier files.
+
 **Why:** Source records are the day's working view, not a permanent display of all archived files.
 
 **How to apply:** Use Palestine calendar days. Reset only view state, never stored files or notes. Opening from history starts a new view timestamp. Do not hide unsaved/error-state edits on rollover until they are resolved. View state is per account and browser, not a claim of cross-device synchronization.

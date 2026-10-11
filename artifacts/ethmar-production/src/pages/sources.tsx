@@ -1,6 +1,6 @@
 import { Eye, FileUp, X } from 'lucide-react';
 import { Link } from 'wouter';
-import { sourceDay, SOURCE_TIME_ZONE } from '@/lib/source-workspace';
+import { newestSourcesFirst, sourceDay, SOURCE_TIME_ZONE } from '@/lib/source-workspace';
 import { Button } from '@/components/ui/button';
 import { FIELD_META, FIELDS, LINES, type Dataset } from '@/lib/data';
 import { useStore } from '@/lib/store';
@@ -191,11 +191,11 @@ function DatasetBlock({ ds }: { ds: Dataset }) {
 
 export default function SourcesPage() {
   const { datasets, setImportOpen, sourceWindows, sourceDay: today, sourceStorageError, saveStates, isArchiveLoading, archiveError } = useStore();
-  const visible = datasets.filter((ds) => {
+  const visible = newestSourcesFirst(datasets.filter((ds) => {
     const opened = sourceWindows[ds.id];
     return ds.origin !== 'csv' || (opened && sourceDay(opened.openedAt) === today)
       || saveStates[ds.id]?.status === 'saving' || saveStates[ds.id]?.status === 'error';
-  });
+  }), sourceWindows);
   return (
     <div className="space-y-5">
       <div className="rise flex flex-wrap items-end justify-between gap-3">
@@ -205,7 +205,7 @@ export default function SourcesPage() {
             كل السجلات كما وردت، للقراءة فقط. «—» حقل غير موجود في السجل، و«غير معروف» خلية فارغة.
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            الملفات المفتوحة اليوم على هذا المتصفح فقط. يُغلق عرضها عند الساعة 12:00 منتصف الليل بتوقيت فلسطين، وتبقى محفوظة في سجل النشاطات ويمكن فتحها مجددًا.
+            الملفات المفتوحة اليوم على هذا المتصفح فقط، والأحدث فتحًا في الأعلى. يُغلق عرضها عند الساعة 12:00 منتصف الليل بتوقيت فلسطين، وتبقى محفوظة في سجل النشاطات ويمكن فتحها مجددًا.
           </p>
         </div>
       </div>

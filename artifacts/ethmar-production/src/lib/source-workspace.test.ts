@@ -1,6 +1,25 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { nextSourceMidnight, sourceDay, todaysSources } from './source-workspace.ts';
+import { newestSourcesFirst, nextSourceMidnight, sourceDay, todaysSources } from './source-workspace.ts';
+
+test('newest opening comes first; reopening moves it above older files without mutating source order', () => {
+  const sources = [{ id: 'demo' }, { id: 'older' }, { id: 'newer' }];
+  const windows = {
+    older: { openedAt: '2026-10-11T10:00:00Z', closed: false },
+    newer: { openedAt: '2026-10-11T11:00:00Z', closed: false },
+  };
+  assert.deepEqual(newestSourcesFirst(sources, windows).map((d) => d.id), ['newer', 'older', 'demo']);
+  windows.older.openedAt = '2026-10-11T12:00:00Z';
+  assert.deepEqual(newestSourcesFirst(sources, windows).map((d) => d.id), ['older', 'newer', 'demo']);
+  assert.deepEqual(sources.map((d) => d.id), ['demo', 'older', 'newer']);
+});
+
+test('equal or missing opening times keep stable ordering', () => {
+  const sources = [{ id: 'first' }, { id: 'second' }];
+  assert.deepEqual(newestSourcesFirst(sources, {}), sources);
+  const entry = { openedAt: '2026-10-11T10:00:00Z', closed: false };
+  assert.deepEqual(newestSourcesFirst(sources, { first: entry, second: entry }), sources);
+});
 
 test('schedules the exact midnight millisecond in summer, winter and at year rollover', () => {
   for (const [now, expected] of [

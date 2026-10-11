@@ -2,6 +2,18 @@ export const SOURCE_TIME_ZONE = 'Asia/Hebron';
 export type SourceWindow = { openedAt: string; closed: boolean };
 export type SourceWindows = Record<string, SourceWindow>;
 
+export function newestSourcesFirst<T extends { id: string }>(sources: T[], windows: SourceWindows): T[] {
+  const time = (id: string) => {
+    const value = Date.parse(windows[id]?.openedAt ?? '');
+    return Number.isFinite(value) ? value : -Infinity;
+  };
+  return [...sources].sort((a, b) => {
+    const first = time(a.id);
+    const second = time(b.id);
+    return first === second ? 0 : first > second ? -1 : 1;
+  });
+}
+
 export function sourceDay(value: string | number | Date) {
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: SOURCE_TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit',
